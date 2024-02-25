@@ -6,9 +6,13 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/genrpg/system/knave"
 	mazerats "github.com/genrpg/system/maze_rats"
 	"github.com/spf13/cobra"
 )
+
+var spellRandom bool
+var spellInt int64
 
 // spellCmd represents the spell command
 var spellCmd = &cobra.Command{
@@ -17,16 +21,26 @@ var spellCmd = &cobra.Command{
 	Long:  `Generate a random spell from a variety of systems.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var spell string
-		switch system {
-		case "mr":
+		switch {
+		case system == "mr" || system == "mazerats":
 			spell = mazerats.GetRandomSpell(verbose)
-		case "mazerats":
-			spell = mazerats.GetRandomSpell(verbose)
+		case system == "knave" || system == "k":
+			if spellRandom {
+				spell = knave.GetRandomSpell(verbose)
+			} else {
+				spell = knave.GetSpell(spellInt, verbose)
+			}
 		}
-		fmt.Printf("\nUsing %s\n%s\n", systemMap[system], spell)
+		if verbose {
+			fmt.Printf("\nUsing %s\n%s\n", systemMap[system], spell)
+		} else {
+			fmt.Println(spell)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(spellCmd)
+	rootCmd.PersistentFlags().BoolVarP(&spellRandom, "random", "r", false, "Generates a random spell rather than a predetermined one. Knave only.")
+	rootCmd.PersistentFlags().Int64VarP(&spellInt, "intelligence", "i", 0, "Set the intelligence score to get already calculated values. Knave only.")
 }

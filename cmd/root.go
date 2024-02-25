@@ -12,10 +12,14 @@ import (
 var system string
 var verbose bool
 
+var mazeRatsName = "Maze Rats by Ben Milton"
+var knaveName = "Knave 2nd edition by Ben Milton"
+
 var systemMap = map[string]string{
-	"mr":       "Maze Rats",
-	"mazerats": "Maze Rats",
-	"knave":    "Knave",
+	"mr":       mazeRatsName,
+	"mazerats": mazeRatsName,
+	"knave":    knaveName,
+	"k":        knaveName,
 }
 
 // rootCmd represents the base command when called without any subcommands
