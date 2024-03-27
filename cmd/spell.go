@@ -41,6 +41,6 @@ var spellCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(spellCmd)
-	rootCmd.PersistentFlags().BoolVarP(&spellRandom, "random", "r", false, "Generates a random spell rather than a predetermined one. Knave only.")
-	rootCmd.PersistentFlags().Int64VarP(&spellInt, "intelligence", "i", 0, "Set the intelligence score to get already calculated values. Knave only.")
+	spellCmd.Flags().BoolVarP(&spellRandom, "random", "r", false, "Generates a random spell rather than a predetermined one. Knave only.")
+	spellCmd.Flags().Int64VarP(&spellInt, "intelligence", "i", 0, "Set the intelligence score to get already calculated values. Knave only.")
 }

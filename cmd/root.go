@@ -14,12 +14,15 @@ var verbose bool
 
 var mazeRatsName = "Maze Rats by Ben Milton"
 var knaveName = "Knave 2nd edition by Ben Milton"
+var shadowDarkName = "ShadowDark by Kelsey Dionne"
 
 var systemMap = map[string]string{
-	"mr":       mazeRatsName,
-	"mazerats": mazeRatsName,
-	"knave":    knaveName,
-	"k":        knaveName,
+	"mr":         mazeRatsName,
+	"mazerats":   mazeRatsName,
+	"knave":      knaveName,
+	"k":          knaveName,
+	"sd":         shadowDarkName,
+	"shadowDark": shadowDarkName,
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -46,7 +49,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVarP(&system, "system", "s", "mr", "System to use (mr, knave, dnd, etc.)")
+	rootCmd.PersistentFlags().StringVarP(&system, "system", "s", "k", "System to use (mr, knave, sd, etc.)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Explains all of the tables used and numbers rolled to generate the output.")
 
 	// Cobra also supports local flags, which will only run
