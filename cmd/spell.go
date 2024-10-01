@@ -9,6 +9,7 @@ import (
 	"github.com/genrpg/system/knave"
 	mazerats "github.com/genrpg/system/maze_rats"
 	"github.com/spf13/cobra"
+	"github.com/ttacon/chalk"
 )
 
 var spellRandom bool
@@ -32,7 +33,7 @@ var spellCmd = &cobra.Command{
 			}
 		}
 		if verbose {
-			fmt.Printf("\nUsing %s\n%s\n", systemMap[system], spell)
+			fmt.Printf("\n%s\n\n%s\n", chalk.Underline.TextStyle(fmt.Sprintf("Using %s", systemMap[system])), spell)
 		} else {
 			fmt.Println(spell)
 		}

@@ -2,7 +2,8 @@ package ose
 
 import (
 	"fmt"
-	"math/rand"
+
+	"github.com/genrpg/utils"
 )
 
 var engine = map[int]func() string{
@@ -17,7 +18,7 @@ var engine = map[int]func() string{
 func Stocking(rooms int64) {
 	for i := int64(0); i < rooms; i++ {
 		roomContents := ""
-		roll := rand.Intn(6)
+		roll := utils.TableDie(6)
 		f := engine[roll]
 		roomContents += f()
 		fmt.Printf("%03d: %s\n", i+1, roomContents)

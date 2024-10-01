@@ -3,6 +3,8 @@ package shadowdark
 import (
 	"fmt"
 	"math/rand"
+
+	"github.com/genrpg/utils"
 )
 
 func getTrap() string {
@@ -27,7 +29,7 @@ var engine = map[int]func() string{
 func Stocking(rooms int64) {
 	for i := int64(0); i < rooms; i++ {
 		roomContents := ""
-		roll := rand.Intn(6)
+		roll := utils.TableDie(6)
 		f := engine[roll]
 		roomContents += f()
 		fmt.Printf("%3d: \n", i+1)

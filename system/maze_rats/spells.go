@@ -2,8 +2,10 @@ package mazerats
 
 import (
 	"fmt"
-	"math/rand"
 	"strings"
+
+	"github.com/genrpg/utils"
+	"github.com/ttacon/chalk"
 )
 
 func getPhysicalEffect(i, ii int) string {
@@ -58,19 +60,23 @@ func GetRandomSpell(verbose bool) string {
 	spellParts := []string{}
 	rolls := [2]int{}
 	for i := 0; i < 2; i++ {
-		rolls[i] = rand.Intn(6)
+		rolls[i] = utils.TableDie(6)
 	}
 	spellRecipeOutput := getSpellRecipeOutput(rolls[0], rolls[1])
 	spellRecipeOutputParts := strings.Split(spellRecipeOutput, " + ")
 	verboseOutput += fmt.Sprintf("Rolls: %d, %d\nRecipe: %s\n\n", rolls[0]+1, rolls[1]+1, spellRecipeOutput)
+	// verboseOutput += "Table | Rolls | Result\n"
 	for i, f := range getSpellRecipe(rolls[0], rolls[1]) {
 		for ii := 0; ii < 2; ii++ {
-			rolls[ii] = rand.Intn(6)
+			rolls[ii] = utils.TableDie(6)
 		}
 		spellParts = append(spellParts, f(rolls[0], rolls[1]))
-		verboseOutput += fmt.Sprintf("Table: %s | Rolls: [%d, %d] | Result: %s\n\n", spellRecipeOutputParts[i], rolls[0]+1, rolls[1]+1, spellParts[i])
+		verboseOutput += fmt.Sprintf("%s | %s | %s\n\n",
+			chalk.Bold.TextStyle(spellRecipeOutputParts[i]),
+			chalk.Bold.TextStyle(fmt.Sprintf("[%d, %d]", rolls[0]+1, rolls[1]+1)),
+			chalk.Bold.TextStyle(spellParts[i]))
 	}
-	spell := strings.Join(spellParts, (" "))
+	spell := utils.SpellStyle(strings.Join(spellParts, (" ")))
 	if verbose {
 		verboseOutput += fmt.Sprintf("Spell: %s", spell)
 		return verboseOutput

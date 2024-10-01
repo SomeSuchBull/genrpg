@@ -3,37 +3,119 @@ package knave
 import (
 	"fmt"
 	"math/rand"
+	"regexp"
+	"strings"
+
+	"github.com/genrpg/utils"
+	"github.com/ttacon/chalk"
 )
 
-// TIP: Roll twice on these tables and combine the results.
-var engine = map[int]func() string{
-	0: getStockingTreasure, 1: getStockingTreasure, 2: getStockingMonster,
-	3: getStockingMonster, 4: getSpecial, 5: getTrap}
-
-func Stocking(rooms int64) {
-	for i := int64(0); i < rooms; i++ {
-		roomContents := ""
-		roll := rand.Intn(6)
-		f := engine[roll]
-		roomContents += f()
-		fmt.Printf("%03d: %s\n", i+1, roomContents)
+func getEmpty(ctx utils.StockingContext, verboseOutput *string) string {
+	treasure := ""
+	if td(6) < 1 {
+		treasure = fmt.Sprintf("\n%s", getStockingTreasure(ctx, verboseOutput))
 	}
+	return chalk.Bold.TextStyle("Empty room") + treasure
 }
 
-func getStockingTreasure() string {
-	return "Treasure"
+func getStockingTreasure(ctx utils.StockingContext, verboseOutput *string) string {
+	table := "Treasure"
+	roll := td(100)
+	result := treasures[roll]
+	if verboseOutput != nil {
+		*verboseOutput += tableRoll(table, roll, result)
+	}
+	return fmt.Sprintf("%s: %s\n%s: %s", chalk.Bold.TextStyle("Treasure"), recursiveTableRoll(result, verboseOutput),
+		chalk.Bold.TextStyle("Alt"), getLevelAppropriateTreasure(ctx))
 }
 
-func getStockingMonster() string {
-	return "Monster"
+func getLevelAppropriateTreasure(ctx utils.StockingContext) string {
+	level := rand.Intn(9) + 1
+	if ctx.Level != 0 {
+		level = ctx.Level
+	}
+	treasureLevel := level / 2
+	if treasureLevel > 4 {
+		treasureLevel = 4
+	}
+	altTreasure := levelTreasure[treasureLevel]
+	magicItem := "None"
+	if altTreasure["Magic item"] != 0 {
+		magicItem = recurs("Magic item", nil)
+	}
+	output := ""
+	for k, v := range altTreasure {
+		if v != 0 {
+			switch k {
+			case "Gems":
+				output += fmt.Sprintf("%s: %d(×100GP) | ", k, v)
+			case "Pieces of jewellery":
+				output += fmt.Sprintf("%s: %d(×%dGP) | ", k, v, (d(6)+d(6)+d(6))*100)
+			case "Magic item":
+				output += fmt.Sprintf("%s: %s | ", chalk.Bold.TextStyle(k), magicItem)
+			default:
+				output += fmt.Sprintf("%s: %d | ", k, v)
+			}
+		}
+	}
+	return strings.TrimSuffix(output, " | ")
 }
 
-func getSpecial() string {
-	return "Special"
+func getStockingMonster(ctx utils.StockingContext, verboseOutput *string) string {
+	treasure := ""
+	if td(6) < 3 {
+		treasure = fmt.Sprintf("\n%s", getStockingTreasure(ctx, verboseOutput))
+	}
+	table := "Monster"
+	roll := td(100)
+	result1 := monsters[roll]
+	if verboseOutput != nil {
+		*verboseOutput += tableRoll(table, roll, result1)
+	}
+	roll = td(100)
+	result2 := activities[roll]
+	if verboseOutput != nil {
+		*verboseOutput += tableRoll(table, roll, result2)
+	}
+	numberOfMonsters := []string{"Too many", "A lot", "A few", "A few", "One", "One"}[td(6)]
+	return fmt.Sprintf("%s: %s | %s: %s | %s: %s",
+		chalk.Bold.TextStyle("Monster"), recursiveTableRoll(result1, verboseOutput),
+		chalk.Bold.TextStyle("Number"), numberOfMonsters,
+		chalk.Bold.TextStyle("Activity"), recursiveTableRoll(result2, verboseOutput)) + treasure
 }
 
-func getTrap() string {
-	return "Trap"
+func getSpecial(ctx utils.StockingContext, verboseOutput *string) string {
+	// TODO: Implement NPCs doing something with a goal of ...
+	// Alt: delve shift, something to spice up the dungeon
+	return chalk.Bold.TextStyle("Special")
+}
+
+func getTrap(ctx utils.StockingContext, verboseOutput *string) string {
+	treasure := ""
+	if td(6) < 2 {
+		treasure = fmt.Sprintf("\n%s", getStockingTreasure(ctx, verboseOutput))
+	}
+	table := "Trap"
+	roll := td(100)
+	result1 := trapEffects[roll]
+	if verboseOutput != nil {
+		*verboseOutput += tableRoll(table, roll, result1)
+	}
+	table = "Hazard"
+	roll = td(100)
+	result2 := hazards[roll]
+	if verboseOutput != nil {
+		*verboseOutput += tableRoll(table, roll, result2)
+	}
+	table = "Mechanism"
+	roll = td(100)
+	result3 := mechanisms[roll]
+	if verboseOutput != nil {
+		*verboseOutput += tableRoll(table, roll, result3)
+	}
+	return fmt.Sprintf("%s: %s | %s: %s | %s: %s", chalk.Bold.TextStyle("Trap"), recursiveTableRoll(result1, verboseOutput),
+		chalk.Bold.TextStyle("Hazard"), recursiveTableRoll(result2, verboseOutput),
+		chalk.Bold.TextStyle("Mechanism"), recursiveTableRoll(result3, verboseOutput)) + treasure
 }
 
 var recurs func(string, *string) string
@@ -50,7 +132,7 @@ func recursiveTableRoll(key string, verboseOutput *string) string {
 		return key
 	}
 	table := key
-	roll := rand.Intn(100)
+	roll := td(100)
 	tableResults := referencedTables[key]
 	var result string
 	if tableResults["function"] != nil {
@@ -69,16 +151,24 @@ func recursiveTableRoll(key string, verboseOutput *string) string {
 	return fmt.Sprintf(format, recursiveTableRoll(result, verboseOutput))
 }
 
-func tableRoll(table string, roll int, result string) string {
-	return fmt.Sprintf("-----\nTable:  %s\nRoll:   %-3.02d\nResult: %s\n\n", table, roll+1, result)
+func tableRoll(table string, rollInt int, result string) string {
+	table = tableRefRegex.ReplaceAllString(table, "")
+	roll := fmt.Sprintf("%02d", rollInt+1)
+	if len(roll) > 2 {
+		roll = roll[1:]
+	}
+	val := fmt.Sprintf("%-14s | %s | %s ", table, roll, result)
+	return utils.TableStyle(val) + "\n"
 }
 
 func getSpellbook(i int) string {
-	// return spellbooks[i]
 	return "A spellbook, todo"
 }
 func getSpellScroll(i int) string {
-	return "Scroll of " + setSpells[i]
+	return "Scroll of " + getSetSpellTitle(i)
+}
+func getRandomMagicItem(i int) string {
+	return "Magic item, todo"
 }
 
 func getInn(i int) string {
@@ -102,6 +192,8 @@ func getRandSpell(i int) string {
 	return getRandomSpellProxy(false)
 }
 
+var tableRefRegex = regexp.MustCompile(`\s*\([^)]+\)`)
+
 var referencedTables = map[string]map[string]any{
 	"Travel shift (p. 9)":   {"table": travelShifts},
 	"Sign (p. 10)":          {"table": signs},
@@ -116,6 +208,7 @@ var referencedTables = map[string]map[string]any{
 	"Dungeon (p. 16)":       {"table": dungeons},
 	"Hazard (p. 17)":        {"table": hazards},
 	"Mechanism (p. 17)":     {"table": mechanisms},
+	"Activity (p. 19)":      {"table": activities},
 	"Spell scroll (p. 22)":  {"function": getSpellScroll},
 	"Spellbook (p. 22)":     {"function": getSpellbook},
 	"Spell (pp. 22-25)":     {"function": getRandSpell},
@@ -227,4 +320,6 @@ var referencedTables = map[string]map[string]any{
 	"Sound (p. 66)":         {"table": sounds},
 	"Tactic (p. 67)":        {"table": tactics},
 	"Weakness (p. 67)":      {"table": weaknesses},
+	// Custom tables and functions
+	"Magic item": {"function": getRandomMagicItem},
 }

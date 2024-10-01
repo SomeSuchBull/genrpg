@@ -22,7 +22,7 @@ var systemMap = map[string]string{
 	"knave":      knaveName,
 	"k":          knaveName,
 	"sd":         shadowDarkName,
-	"shadowDark": shadowDarkName,
+	"shadowdark": shadowDarkName,
 }
 
 // rootCmd represents the base command when called without any subcommands
