@@ -38,6 +38,28 @@ func (pc *PlayerCharacter) NewBrute() {
 	pc.Class = brute
 }
 
+func (b *Brute) GetClothingDie() int {
+	return b.ClothingDie
+}
+func (b *Brute) GetHatDie() int {
+	return b.HatDie
+}
+func (b *Brute) GetWeaponDie() int {
+	return 0
+}
+
+func (b *Brute) GetFeatures() []Feature {
+	return b.Features
+}
+
+func (b *Brute) GetHPDie() int {
+	return b.HitDie
+}
+
+func (b *Brute) GetStatMods() Stats {
+	return b.StatMods
+}
+
 func (*Brute) String() string {
 	return "Brute"
 }
@@ -50,6 +72,7 @@ func (b *Brute) Level() int {
 	return b.Lvl
 }
 
+// TODO: decide if this is something even worth pursuing
 func (b *Brute) LevelUp() {}
 
 func (b *Brute) GetItems() []Item {
@@ -82,47 +105,47 @@ var startingFeatures = map[int]BruteFeature{1: feature1, 2: feature2, 3: feature
 
 var feature1 = BruteFeature{
 	Item: Item{
-		Name: "Brass anchor",
+		Name:  "Brass anchor",
+		Extra: "Requires 2 hands and target's armor is reduced by one tier " + B("(-d2)") + " during the attack.",
 	},
 	Damage: "d8",
-	Extra:  "Requires 2 hands and target's armor is reduced by one tier " + B("(-d2)") + " during the attack.",
 }
 
 var feature2 = BruteFeature{
 	Item: Item{
-		Name: "Whaling harpoon",
+		Name:  "Whaling harpoon",
+		Extra: "Can be thrown by testing " + B("AGILITY DR10") + ".",
 	},
 	Damage: "d8",
-	Extra:  "Can be thrown by testing " + B("AGILITY DR10") + ".",
 }
 
 var feature3 = BruteFeature{
 	Item: Item{
-		Name: "Meat cleaver",
+		Name:  "Meat cleaver",
+		Extra: "Caked in layers of dried blood. On a damage roll of " + B("1") + " it spreads a disease from one of its prior victims: the target loses " + B("d6") + " HP at the start of its next " + B("two") + " turns.",
 	},
 	Damage: "d4",
-	Extra:  "Caked in layers of dried blood. On a damage roll of " + B("1") + " it spreads a disease from one of its prior victims: the target loses " + B("d6") + " HP at the start of its next " + B("two") + " turns.",
 }
 
 var feature4 = BruteFeature{
 	Item: Item{
-		Name: "Part of a broken mast",
+		Name:  "Part of a broken mast",
+		Extra: "It has a rusted nail protruding from one end. Deals an extra " + B("d6") + " on a critical hit.",
 	},
 	Damage: "d8",
-	Extra:  "It has a rusted nail protruding from one end. Deals an extra " + B("d6") + " on a critical hit.",
 }
 
 var feature5 = BruteFeature{
 	Item: Item{
-		Name: "Runic machete",
+		Name:  "Runic machete",
+		Extra: "Great for chopping down vines and fopdoodles. It glows in the dark if there are undead nearby.",
 	},
 	Damage: "d6",
-	Extra:  "Great for chopping down vines and fopdoodles. It glows in the dark if there are undead nearby.",
 }
 
 var feature6 = BruteFeature{
 	Item: Item{
-		Name: "Rotten cargo net",
+		Name:  "Rotten cargo net",
+		Extra: "Test " + B("AGILITY DR12") + " to throw it at something and stop it from moving for " + B("d2") + " rounds. Trapped targets take " + B("d2") + " damage/round.",
 	},
-	Extra: "Test " + B("AGILITY DR12") + " to throw it at something and stop it from moving for " + B("d2") + " rounds. Trapped targets take " + B("d2") + " damage/round.",
 }
