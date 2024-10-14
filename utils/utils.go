@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"fmt"
 	"math/rand"
 
 	"github.com/ttacon/chalk"
@@ -49,4 +51,14 @@ func MonsterStyle(val string) string {
 func TableStyle(val string) string {
 	return chalk.Black.NewStyle().WithBackground(chalk.White).Style(val)
 	// WithTextStyle(chalk.Bold).Style(val)
+}
+
+func PrintJSON(j any) error {
+	var out []byte
+	var err error
+	out, err = json.MarshalIndent(j, "", "    ")
+	if err == nil {
+		fmt.Println(string(out))
+	}
+	return err
 }

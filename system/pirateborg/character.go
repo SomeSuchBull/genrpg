@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/genrpg/utils"
+	"github.com/ttacon/chalk"
 )
 
 type Stats struct {
@@ -13,6 +14,11 @@ type Stats struct {
 	Presence  int `json:"presence"`
 	Toughness int `json:"toughness"`
 	Spirit    int `json:"spirit"`
+}
+
+func (s Stats) String() string {
+	return fmt.Sprintf("  Strength: %d\n  Agility: %d\n  Presence: %d\n  Toughness: %d\n  Spirit: %d",
+		s.Strength, s.Agility, s.Presence, s.Toughness, s.Spirit)
 }
 
 // type Stats struct {
@@ -24,30 +30,59 @@ type Stats struct {
 // }
 
 type PlayerCharacter struct {
+	Name              string      `json:"name"`
 	Stats             Stats       `json:"stats"`
 	Class             PlayerClass `json:"class"`
 	Features          []Feature   `json:"features"`
 	HP                int         `json:"hp"`
 	CarryingCapacity  int         `json:"carryingCapacity"`
-	Name              string      `json:"name"`
 	Nickname          string      `json:"nickname"`
-	Weapons           []Weapon    `json:"weapons"`
+	Weapons           Weapons     `json:"weapons"`
 	Clothing          Clothing    `json:"clothing"`
 	Armor             string      `json:"armor"`
 	Hat               Hat         `json:"hat"`
-	Gear              []Item      `json:"gear"`
+	Gear              Gear        `json:"gear"`
 	Container         string      `json:"container"`
 	Money             string      `json:"money"`
 	Character         Character   `json:"character"`
 	ThingOfImportance string      `json:"thingOfImportance"`
 }
 
+type Weapons []Weapon
+
+type Gear []Item
+
+func (g Gear) String() string {
+	var val string
+	for _, i := range g {
+		val += fmt.Sprintln(i.String())
+	}
+	return val
+}
+
+func (ws Weapons) String() string {
+	var val string
+	for _, w := range ws {
+		val += fmt.Sprintln(w.String())
+	}
+	return val
+}
+
 type Character struct {
-	Background          string `json:"background"`
-	DistinctiveFlaw     string `json:"distinctiveFlaw"`
-	PhysicalTrademark   string `json:"physicalTrademark"`
-	Idiosyncrasy        string `json:"idiosyncrasy"`
-	UnfortunateIncident string `json:"unfortunateIncident"`
+	Background          string `json:"background,omitempty"`
+	DistinctiveFlaw     string `json:"distinctiveFlaw,omitempty"`
+	PhysicalTrademark   string `json:"physicalTrademark,omitempty"`
+	Idiosyncrasy        string `json:"idiosyncrasy,omitempty"`
+	UnfortunateIncident string `json:"unfortunateIncident,omitempty"`
+}
+
+func (c Character) String() string {
+	val := fmt.Sprintf("%s %s\n", chalk.Yellow.Color("Background:"), c.Background)
+	val += fmt.Sprintf("%s %s\n", chalk.Yellow.Color("Distinctive Flaw:"), c.DistinctiveFlaw)
+	val += fmt.Sprintf("%s %s\n", chalk.Yellow.Color("Physical Trademark:"), c.PhysicalTrademark)
+	val += fmt.Sprintf("%s %s\n", chalk.Yellow.Color("Idiosyncrasy:"), c.Idiosyncrasy)
+	val += fmt.Sprintf("%s %s", chalk.Yellow.Color("Unfortunate Incident or Condition:"), c.UnfortunateIncident)
+	return val
 }
 
 type PlayerClass interface {
@@ -64,6 +99,7 @@ type PlayerClass interface {
 	GetClothingDie() int
 	GetHatDie() int
 	GetWeaponDie() int
+	GetDevilsLuck() string
 }
 
 type Feature interface {
@@ -80,9 +116,9 @@ func NewCharacter(additionalClasses ...bool) *PlayerCharacter {
 	pc.StartingHat()
 	pc.StartGear()
 	pc.Features = append(pc.Features, pc.Class.GetFeatures()...)
-	// TODO:
 	pc.WhoIsThisPerson()
-	// pc.CreateThingOfImportance()
+	pc.CreateThingOfImportance()
+	pc.GetRandomName()
 	return pc
 }
 
@@ -94,6 +130,16 @@ func (pc *PlayerCharacter) GetClass(additionalClasses ...bool) {
 	switch res {
 	case 1:
 		pc.NewBrute()
+	case 2:
+		pc.NewRapscallion()
+	case 3:
+		pc.NewBuccaneer()
+	case 4:
+		pc.NewSwashbuckler()
+	case 5:
+		pc.NewZealot()
+	case 6:
+		pc.NewSorcerer()
 	}
 }
 
@@ -171,7 +217,7 @@ func GenerateStat() int {
 
 func (pc *PlayerCharacter) StartingHP() {
 	pc.HP = utils.D(pc.Class.GetHPDie()) + pc.Stats.Toughness
-	if pc.HP < 0 {
+	if pc.HP < 1 {
 		pc.HP = 1
 	}
 }
@@ -203,7 +249,7 @@ func RollForWeapon(d int) Weapon {
 	case 2:
 		return Weapon{Item: Item{Name: "Knife or Bayonet"}, Damage: "d4"}
 	case 3:
-		return Weapon{Item: Item{Name: "SmallSword or Machete"}, Damage: "d4"}
+		return Weapon{Item: Item{Name: "Smallsword or Machete"}, Damage: "d4"}
 	case 4:
 		return Weapon{Item: Item{Name: "Cat O' Nine Tails", Extra: "10' reach"}, Damage: "d4"}
 	case 5:
@@ -400,37 +446,79 @@ func RollContainer() string {
 }
 
 func (pc *PlayerCharacter) WhoIsThisPerson() {
-	// TODO: finish all of this
 	background := RollBackground()
+	bg := background.String()
+	if background.RestOfBackground != "" {
+		bg += I(", you have " + background.RestOfBackground)
+	}
 	pc.Character = Character{
-		Background:          background.String(),
+		Background:          bg,
 		DistinctiveFlaw:     RollDistinctiveFlaw(),
 		PhysicalTrademark:   RollPhysicalTrademark(),
 		Idiosyncrasy:        RollIdiosyncrasy(),
 		UnfortunateIncident: RollUnfortunateIncident(),
 	}
+	pc.Money = background.Money
+	if background.Item.Name != "" {
+		pc.Gear = append(pc.Gear, background.Item)
+	}
+}
+
+func (pc *PlayerCharacter) CreateThingOfImportance() {
+	pc.ThingOfImportance = RollThingOfImportance()
+	pc.Gear = append(pc.Gear, Item{Name: pc.ThingOfImportance})
+
 }
 
 type CharacterBackground struct {
-	Name string
+	Name             string
+	Money            string
+	Item             Item
+	RestOfBackground string
 }
 
 func (cb CharacterBackground) String() string {
 	return cb.Name
 }
 
+func GetBackgroundList() []CharacterBackground {
+	backgroundList := []CharacterBackground{}
+	for k, v := range backgrounds {
+		backgroundList = append(backgroundList, CharacterBackground{
+			Name:             k,
+			Money:            v[0],
+			Item:             Item{Name: v[1]},
+			RestOfBackground: v[2],
+		})
+	}
+	return backgroundList
+}
+
 func RollBackground() CharacterBackground {
-	return CharacterBackground{Name: "background"}
+	r := utils.TableDie(100)
+	if r < 19 {
+		r = 19
+	}
+	r -= 19
+	return GetBackgroundList()[r]
 }
 func RollDistinctiveFlaw() string {
-	return "distinctive flaw"
+	return distinctiveFlaws[utils.TableDie(20)]
 }
 func RollPhysicalTrademark() string {
-	return "physical trademark"
+	return physicalTrademarks[utils.TableDie(20)]
 }
 func RollIdiosyncrasy() string {
-	return "idiosyncrasy"
+	return idiosyncrasies[utils.TableDie(20)]
 }
 func RollUnfortunateIncident() string {
-	return "unfortunate incident"
+	return unfortunateIncidents[utils.TableDie(20)]
+}
+
+func RollThingOfImportance() string {
+	return thingsOfImportance[utils.TableDie(100)]
+}
+
+func (pc *PlayerCharacter) GetRandomName() {
+	pc.Name = ""
 }

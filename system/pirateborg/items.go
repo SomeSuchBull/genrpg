@@ -1,26 +1,71 @@
 package pirateborg
 
-import "github.com/ttacon/chalk"
+import (
+	"fmt"
+
+	"github.com/ttacon/chalk"
+)
 
 type Item struct {
-	Price string
-	Name  string
-	Extra string
+	Name  string `json:"name,omitempty"`
+	Price string `json:"price,omitempty"`
+	Extra string `json:"extra,omitempty"`
 }
 
 type Weapon struct {
 	Item
-	Damage string
+	Damage string `json:"damage,omitempty"`
+}
+
+func (i Item) String() string {
+	name := i.Name
+	price := i.Price
+	extra := i.Extra
+	if name == "" {
+		name = "-"
+	}
+	if price == "" {
+		price = "-"
+	}
+	if extra == "" {
+		extra = "-"
+	}
+	return fmt.Sprintf("%s | %s | %s", name, price, extra)
+}
+
+func (w Weapon) String() string {
+	name := w.Name
+	dmg := w.Damage
+	price := w.Price
+	extra := w.Extra
+	if dmg == "" {
+		dmg = "-"
+	}
+	if price == "" {
+		price = "-"
+	}
+	if extra == "" {
+		extra = "-"
+	}
+	return fmt.Sprintf("%s | %s | %s | %s", name, dmg, price, extra)
 }
 
 type Clothing struct {
 	Item
-	Armor string
+	Armor string `json:"armor,omitempty"`
+}
+
+func (i Clothing) String() string {
+	return i.Item.String() + " | " + i.Armor
 }
 
 type Hat struct {
 	Item
-	Armor string
+	Armor string `json:"armor,omitempty"`
+}
+
+func (i Hat) String() string {
+	return i.Item.String() + " | " + i.Armor
 }
 
 type AncientRelic struct {
