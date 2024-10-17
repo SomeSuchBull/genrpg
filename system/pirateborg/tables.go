@@ -231,10 +231,6 @@ var bombs = map[string]any{
 
 var bombsText = "Test Agility DR12 to hit an area. Hit: Creatures within 5' of the area test Agility DR12 or take damage. Fumble: hit self and/or d4 allies instead. Crit: x2 dmg."
 
-// TODOs:
-//	Endpages content
-//	The rest of it
-
 var ancientRelics = map[int]Item{
 	1:  {Name: "Cross of the Paragon", Extra: "One ally gets " + B("+1") + " to attack and " + B("+1") + " to damage for " + B("d6") + " turns."},
 	2:  {Name: "Conch Shell from the Abyss", Extra: "Ask a nearby corpse (or any creature that died at sea within 100 miles) one question"},
@@ -266,105 +262,48 @@ var idiosyncrasies = []string{"You smoke " + I("constantly") + ", and cough even
 
 var unfortunateIncidents = []string{"Your loved ones were burned alive. Revenge is imminent.", "You are a " + I("known") + " pirate. You face the gallows if caught.", "You betrayed former crewmates. Now they hunt " + I("you") + ".", "You were marooned on an island for far too long. The voices " + I("must") + " be real.", "You stole a ship. The owner wants your money or your head, but will settle for both.", "You escaped captivity, and will " + I("never") + " go back.", "A close relative has become your greatest enemy.", "The last three ships you crewed all sank.", "Your last crew was killed by undead. They left you alive on purpose.", "Political leaders hold your loved one(s) captive.", "An undead spirit you don't like possesses you regularly.", "You wronged an infamous pirate lord.", "You narrowly escaped a cannibalistic ending, but you didn't escape " + I("that smell") + ".", "You slaughtered them. Like " + I("animals") + ".", "You are the mysterious lone survivor of a treasure expedition gone awry.", "[d2] 1: Failed mutineer. 2: Successful mutineer.", "A silent ghost haunts you. It is always there, but only you can see it.", "You deserted the military, but you're not sure who knows so.", "You have no memory before a few days ago.", "You died once already, but Hell didn't want you."}
 
-// var thingsOfImportance = []Item{
-// 	{Name: "animal pelt"},
-// 	{Name: "oyster pearl"},
-// 	{Name: "silver locket"},
-// 	{Name: "conch shell"},
-// 	{Name: "pipe carved from wood"},
-// 	{Name: "pipe carved from bone"},
-// 	{Name: "small jade figurine"},
-// 	{Name: "ancient gold coin"},
-// 	{Name: "ruined piece of a treasure map"},
-// 	{Name: "map of an unknown place"},
-// 	{Name: "diary written by an ancestor"},
-// 	{Name: "silver ring"},
-// 	{Name: "ivory chess piece"},
-// 	{Name: "sea creature carved from obsidian"},
-// 	{Name: "spherical prism"},
-// 	{Name: "jar containing a severed hand"},
-// 	{Name: "necklace of bones & feathers"},
-// 	{Name: "book of scripture"},
-// 	{Name: "novel you loved as a child"},
-// 	{Name: "bizarre silk handkerchief"},
-// 	{Name: "pouch containing animal teeth"},
-// 	{Name: "old fillet knife"},
-// 	{Name: "fossil of an extinct fish"},
-// 	{Name: "piece of colorful coral"},
-// 	{Name: "small ship in a bottle"},
-// 	{Name: "letter from a loved one"},
-// 	{Name: "the journal of a dead explorer"},
-// 	{Name: "stone embossed with a mermaid"},
-// 	{Name: "vial of holy water from clergy in your hometown"},
-// 	{Name: "the remains of a small squid in a jar"},
-// 	{Name: "precious cooking salts in a tiny chest"},
-// 	{Name: "tankard made from a horn"},
-// 	{Name: "jar of the finest tobacco"},
-// 	{Name: "golden letter opener"},
-// 	{Name: "small, cast bronze owl figurine"},
-// 	{Name: "collection of sea shells and rocks"},
-// 	{Name: "necklace carved from jade"},
-// 	{Name: "a recently deceased relative's will naming you as the sole heir"},
-// 	{Name: "drawing of a loved one"},
-// 	{Name: "bag of “magical” white powder"},
-// 	{Name: "old rusted key with a blue gem that glows in the moonlight"},
-// 	{Name: "compass that doesn't point north"},
-// 	{Name: "clay jar you are using as an urn"},
-// 	{Name: "definitive proof of an enemy's (or loved one's) crime"},
-// 	{Name: "small golden bell"},
-// 	{Name: "old bottle of red wine (Bordeaux, incredible vintage)"},
-// 	{Name: "jar of dried jellyfish dust"},
-// 	{Name: "multi-colored feather"},
-// 	{Name: "necklace from a loved one"},
-// 	{Name: "ring that doesn't fit on your fingers"},
-// 	{Name: "single diamond earring"},
-// 	{Name: "finely made leather eye patch"},
-// 	{Name: "set of gardening tools"},
-// 	{Name: "dried flower"},
-// 	{Name: "animal skull"},
-// 	{Name: "human skull"},
-// 	{Name: "gem that glows in seawater"},
-// 	{Name: "dinosaur or monster bone or claw"},
-// 	{Name: "jar of fireflies"},
-// 	{Name: "leather-bound tome in a language you don't recognize"},
-// 	{Name: "blueprints to a new type of ship"},
-// 	{Name: "carved arrowhead"},
-// 	{Name: "stone tablet inscribed with ancient pictographs or hieroglyphs"},
-// 	{Name: "perfect cube made of crystal"},
-// 	{Name: "tattoo, d4: 1 love, 2 revenge, 3 ancestors, 4 unknown origin"},
-// 	{Name: "bottle of perfumed oil"},
-// 	{Name: "broken set of manacles"},
-// 	{Name: "broken compass"},
-// 	{Name: "pistol with one shot meant for someone special"},
-// 	{Name: "flag of personal significance"},
-// 	{Name: "broken spyglass with a scroll or map hidden inside"},
-// 	{Name: "length of rope you made"},
-// 	{Name: "carved gaming pieces"},
-// 	{Name: "set of rune stones"},
-// 	{Name: "twig from a very old tree"},
-// 	{Name: "noose taken from a corpse"},
-// 	{Name: "6' length of chain"},
-// 	{Name: "4d10 scars from lashes on your back"},
-// 	{Name: "long scar on your face"},
-// 	{Name: "two coconut shells"},
-// 	{Name: "dark robe, cape, or cloak"},
-// 	{Name: "cask of strong sassafras beer"},
-// 	{Name: "set of keys on a large key ring"},
-// 	{Name: "small keg of something valuable (rum, powder, ashes, ASH)"},
-// 	{Name: "magnifying lens (glass only)"},
-// 	{Name: "cork from a bottle, from a special occasion"},
-// 	{Name: "cannonball"},
-// 	{Name: "deck of cards with 1d4 cards missing and 1d6 \"extra\" cards"},
-// 	{Name: "garment from someone special"},
-// 	{Name: "wanted poster, d4: 1 legend, 2 enemy, 3 loved one, 4 stranger"},
-// 	{Name: "fancy wig"},
-// 	{Name: "letter of political importance"},
-// 	{Name: "tanned whale skin or jar of blubber"},
-// 	{Name: "petrified egg"},
-// 	{Name: "monkey paw extending 1 finger"},
-// 	{Name: "memorized poem that sounds like a map"},
-// 	{Name: "medallion that might be the top of a staff"},
-// 	{Name: "talisman shaped like a snake"},
-// 	{Name: "glass vial of dark blood"},
-// 	{Name: "shard of crystal"},
-// }
+// TODOs:
+//	Endpages content
+//	The rest of it
+
+// d10
+var vesselClass = []string{"raft", "longboat", "tartane", "sloop", "brigantine", "fluyt", "frigate", "galleon", "man-of-war", "ship of the line"}
+
+// d6
+var armament = []string{"Merchant: No weapons.", "Lightly armed: reduce damage die size by one.", "Normal armament", "Warship: Double broadside"}
+
+// d6
+var crewQuantity = []string{"Short-handed: half as many.", "Standard crew.", "Ready for war: twice as many.", "Ready to raid: as many as possible."}
+
+// 2d6
+var crewQuality = []string{"Near mutiny and/or untrained.", "Miserable and/or novice.", "Average.", "Fresh from shore leave and/or experienced.", "Prosperous/loyal and/or military training"}
+
+// d66(d36)
+var shipName = []string{"Banshee's Wail", "Revenant", "Void Ripper", "Mermaid's Tear", "Carrion Crow", "Executioner's Hand", "Poseidon's Rage", "Adventure's Ghost", "Widow's Revenge", "Blood Moon", "Devil's Scorn", "Gilded Parrot", "Monolith", "Black Tide", "Raven's Wrath", "Coral Corsair", "Hellspire", "Vendetta", "Crimson Tempest", "Royal Tomb", "Guillotine", "Neptune's Maiden", "Cadaver's Call", "Heart of the Sea", "Demonwake", "Bride of the Abyss", "Annihilation", "Golden Glaive", "Necrobile", "Grave Witch", "Loa's Lament", "Hunsi Kanzo", "Dragon from the Deep", "Leviathan's Flood", "Kraken's Maw", "Harlequin's Curse"}
+
+// d12 - roll further
+var mundaneCargo = []string{"food or crops , 250s", "spices or oils, 350s", "trade goods, 400s", "livestock, 400s", "sugar, 500s", "rum, 1000s", "munitions, 2000s", "tobacco, 1000s", "wine, 2000s", "antiques, 2000s", "lumber, 1000s", "special cargo"}
+
+// d12 - roll further
+var specialCargo = []string{"raw silver ore, 5000s", "golden coins and treasures, 10000s", "religious leader(s)", "important prisoner(s)", "political or military figure(s)", "relics or a rare artifact, 4000s", "sea monster bones, 2500s", "exotic animals, 2000s", "d10 locked chests, 2d8 x 100s each", "d20 crates of ASH , see pg. 25", "imprisoned undead", "a sorcerer with a tome of d4 Arcane Rituals (pg. 64)"}
+
+// d8
+var optionalVesselPlotTwist = []string{"Deadly disease on board.", "Crew are impostors.", "Crew is mute.", "The PCs know this crew.", "Everyone on board was thought to be dead.", "Ghost ship.", "They're all zombies.", "Someone on board is related to a PC's backstory."}
+
+// d12
+var whereIsIt = []string{"shallow waters (submerged at high tide)", "suspended on shoals (half underwater)", "beach wrecked", "adrift at sea", "anchored off the coast", "suspended on rocks or a coastal cliff", "up a dried-up riverbed", "in the middle of the jungle, forest, or desert", "drifting into port", "orbiting a maelstrom", "floating the waters that lead to the underworld", "in the nightmares of cursed sailors"}
+
+// d12
+var typeOfShip = []string{"several ships fastened together (roll d2 more times)", "sloop", "tartane", "giant jury-rigged raft", "brigantine", "frigate", "ancient vessel", "galleon", "fluyt", "man-of-war", "ship of the line", "otherworldly"}
+
+// d8
+var whatHappenedHere = []string{"demolished during a storm or hurricane", "abandoned for an unknown reason, mostly intact", "ripped in two by a monster from the deep", "run aground or scrapped some shoals", "raided by blood-thirsty undead", "destroyed in naval combat", "wrecked in foggy conditions", "mutiny fueled blood bath"}
+
+// d8
+var inOneOfTheRooms = []string{"filled with large eggs", "bodies of former crew, freshly dead, terror on their faces", "indecipherable glyphs carved into the wood beams", "water damaged books and letters", "hundreds of eyeballs hanging from strings", "a gaping hole in the hull", "rotting food and animal corpses", "glass bottles filled with [d6]: 1 rum 2 potions (pg. 70) 3 fortified wine 4 blood 5 holy water 6 excrement (human?)"}
+
+// d12
+var oddFeature = []string{"walls and floor covered in coral and barnacles", "piles of bleached white bones throughout", "hundreds of small crabs nests", "cargo hold is filled with 6\" of blood", "charred wood and fire damage", "faintly glows in the dark", "mysterious slime covers most surfaces", "ornately decorated in gold leaf and velvet", "a thick layer of ash coats everything", "gravity behaves as if underwater", "signs of torture, sacrifice, and blood-letting", "bioluminescent plants bloom from hull at night"}
+
+// d8 // TODO: Derelict Ships
+var development = []string{}
