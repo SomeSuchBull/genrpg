@@ -408,7 +408,6 @@ var islandDarkness = map[int]string{2: "A kraken dwells here", 3: "Cultists", 4:
 
 // PIRATE --
 
-// TODO: create the generator from page 124
 // d12
 var pirateTableA = []string{"rugged individual", "shady vagabond", "scurvy gutter worm", "famous captain", "escaped prisoner", "wanted cutthroat", "notorious privateer", "cloaked figure", "rum-drunk goon", "horrific wretch", "cocky explorer", "dread pirate lord"}
 
@@ -418,17 +417,41 @@ var pirateTableB = []string{"horrible breath", "unmatched beauty", "a hook for a
 // d12
 var pirateTableC = []string{"pair of fists [d2]", "broken bottle [d2]", "bullwhip [d4]", "hook [d4]", "rusty knife [d4]", "evil cutlass [d6]", "ornate scimitar [d6]", "officer's rapier [d8]", "ancient crossbow [d8]", "flintlock pistol [2d4]", "musket [2d6]", "blunderbuss [d4/d10]"}
 
-// TODO: Finish
 // d36
-var pirateMaleName = []string{}
+var pirateMaleName = []string{"Esteban", "Richard", "Hendrik", "Raymond", "John", "Edmund", "Charles", "Peter", "Olivier", "Barth", "Henry", "Roger", "Don", "Martín", "Louis", "Fredrick", "Willem", "Nicholas", "Jerry", "Edward", "Alvaro", "Gaspar", "Francisco", "Johan", "Carlos", "Francis", "Jacques", "Jack", "François", "Silas", "Thomas", "Jacob", "Juan", "Philippe", "Jean", "William/Billy"}
 
 // d36
-var pirateFemaleName = []string{}
+var pirateFemaleName = []string{"Bridget", "Juliette", "Esther", "Rose", "Beatrice", "Olive", "Antonia", "Charlotte", "Isabel", "Adine", "Angela", "Cécile", "Edwidge", "Catalina", "Elizabeth", "Madeleine", "Anastasia", "Emma", "Mary", "Francisca", "Ana", "Agnes", "Marie", "Eleanor", "Anne", "Henrietta", "Alice", "Margaret", "Jeannette", "Camela", "Catherine", "Ursula", "Anette", "Gabriel", "Esme", "Marion"}
 
 // d36
-var pirateSurname = []string{}
+var pirateSurname = []string{"Pérez", "Thompson", "Jansen", "Williams", "Alva", "Dubois", "Leon", "Brown", "Jones", "Johnson", "Thatch", "Davies", "Archer", "Blanc", "Evans", "Wright", "Smith", "Wilson", "Bernard", "Roberts", "White", "Jean", "Santiago", "Morel", "Rodríguez", "Garcia", "Robinson", "López", "Baker", "Black", "Bonnet", "Walker", "Martin", "Jackson", "Diaz", "Taylor"}
 
 // d36
-var pirateNickname = []string{}
+var pirateNickname = []string{"Sir/Madam", "Sea", "Turtle", "Siren", "Red", "One-Eye/Arm/Leg", "Crimson", "Blue", "Water", "Skull", "Tall-Tale", "Old", "Blood", "Mr./Mrs./Miss", "Gunpowder", "King/Queen", "Bow-legged", "Fish", "Whale", "Bones", "Squid", "Scurvy", "Bilge", "Shark", "Heart", "The Bride/Groom", "Black", "White", "Death", "Dark", "Devil", "Knife", "Claw", "Rat", "Green", "Planktooth"}
 
 // -- PIRATE
+
+// JOBS & QUESTS --
+
+// d20
+var jobsHooks = []string{"Capture a prize.", "Raid a port.", "Treasure hunt.", "Find someone/something.", "Capture, interrogate, or kill someone.", "Establish a new safe house, base, or hideout.", "Sink a ship.", "Steal an item.", "Spy on someone.", "Scavenge a wreck.", "Explore or defend a location.", "Sneak into somewhere.", "Steal something.", "Meet someone.", "Establish trading or fencing relations with someone.", "Free or rescue a person or group from a location.", "Sabotage something.", "Defend a location.", "Free captives or prisoners.", "Escape."}
+
+// d10
+var jobsKeyNPC = []string{"A government leader.", "A famous pirate captain.", "The governor's daughter or son.", "The local drunk.", "A shady figure.", "Some cultists.", "An old friend.", "Important looking pirates.", "A love interest.", "A mermaid."}
+
+// d6
+var jobsRequirements = []string{"Stay out of combat.", "Kill only one person.", "Kill everyone.", "Make it look like someone else did it.", "Bring a hostage back alive.", "Vital information must be obtained."}
+
+// d6
+var jobsTimeRestraint = []string{"Immediately!", "Within the hour.", "By tonight.", "By tomorrow.", "Next week.", "This month."}
+
+// d6
+var jobsComplication = []string{"It's a setup.", "The intel is wrong.", "Another crew is already on the job.", "Some who's not supposed to be there is.", "The reward is suspiciously big.", "Everything is proceeding as planned."}
+
+// -- JOBS & QUESTS
+
+// d20
+var rumors = []string{"A nation's navy is coming in 3d6 days. Everyone is on edge.", "A rich group of merchants are hiring mercenaries to escort them.", "A treasure fleet is rumored to be departing soon.", "An important NPC is recruiting people to explore or scout an area.", "A group of leaders is meeting soon. The PCs have been summoned.", "Someone the PCs know has been killed or captured.", "2d12 pirates are in town spending the earnings from their latest prize.", "Pirates, marines, or revolutionaries are planning to raid a port.", "There are rumors of a rich prize nearby. Crews are recruiting.", "Someone uncovered a clue or map to a fabled treasure and need brains, muscle, or both.", "A corpse has been found in an alley or on the beach. Everyone is suspicious.", "A ship with valuable cargo wrecked nearby.", "A lonely widow (20+d50 years old) is looking for a date to the Governor's Ball.", "It is not safe here at night. The reasons given sound like tall tales or ghost stories.", "A recent fire destroyed a ship, a port, or a farmstead.", "Two allied factions are now at war.", "There is a party tonight to honor a deceased NPC.", "The governor's adult daughter/son is the most beautiful person ever seen.", "A group of cultists have been up to some unusual activity recently.", "Undead have destroyed yet another settlement."}
+
+// 2d6
+var reaction = map[int]string{2: "bloodthirsty", 3: "bloodthirsty", 4: "angered or alarmed", 5: "angered or alarmed", 6: "angered or alarmed", 7: "indifferent, neutral", 8: "indifferent, neutral", 9: "almost friendly", 10: "almost friendly", 11: "helpful", 12: "helpful"}
