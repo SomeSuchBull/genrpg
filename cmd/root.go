@@ -6,6 +6,7 @@ package cmd
 import (
 	"os"
 
+	pb "github.com/genrpg/cmd/pirateborg"
 	"github.com/spf13/cobra"
 )
 
@@ -18,15 +19,15 @@ var shadowDarkName = "ShadowDark by Kelsey Dionne"
 var pirateBorgName = "PIRATE BORG by Limithron"
 
 var systemMap = map[string]string{
-	"mr":         mazeRatsName,
-	"mazerats":   mazeRatsName,
-	"knave":      knaveName,
-	"k":          knaveName,
-	"sd":         shadowDarkName,
-	"shadowdark": shadowDarkName,
+	"mr":          mazeRatsName,
+	"mazerats":    mazeRatsName,
+	"knave":       knaveName,
+	"k":           knaveName,
+	"sd":          shadowDarkName,
+	"shadowdark":  shadowDarkName,
 	"pirate-borg": pirateBorgName,
-	"pirateborg": pirateBorgName,
-	"pb": pirateBorgName,
+	"pirateborg":  pirateBorgName,
+	"pb":          pirateBorgName,
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -59,4 +60,9 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	// Commands from pirateborg
+	rootCmd.AddCommand(pb.IslandCmd)
+	rootCmd.AddCommand(pb.DerelictShipCmd)
+	rootCmd.AddCommand(pb.VesselCmd)
 }

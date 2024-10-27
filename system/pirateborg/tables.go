@@ -279,13 +279,25 @@ var unfortunateIncidents = []string{"Your loved ones were burned alive. Revenge 
 var vesselClass = []string{"raft", "longboat", "tartane", "sloop", "brigantine", "fluyt", "frigate", "galleon", "man-of-war", "ship of the line"}
 
 // d6
-var vesselArmament = []string{"Merchant: No weapons.", "Lightly armed: reduce damage die size by one.", "Normal armament", "Warship: Double broadside"}
+var vesselArmament = []string{"Merchant: No weapons.", "Lightly armed: reduce damage die size by one.", "Normal armament", "Normal armament", "Normal armament", "Warship: Double broadside"}
 
 // d6
-var vesselCrewQuantity = []string{"Short-handed: half as many.", "Standard crew.", "Ready for war: twice as many.", "Ready to raid: as many as possible."}
+var vesselCrewQuantity = []string{"Short-handed: half as many.", "Standard crew.", "Standard crew.", "Ready for war: twice as many.", "Ready for war: twice as many.", "Ready to raid: as many as possible."}
 
 // 2d6
-var vesselCrewQuality = []string{"Near mutiny and/or untrained.", "Miserable and/or novice.", "Average.", "Fresh from shore leave and/or experienced.", "Prosperous/loyal and/or military training"}
+var vesselCrewQuality = map[int]string{
+	2:  "Near mutiny and/or untrained.",
+	3:  "Near mutiny and/or untrained.",
+	4:  "Miserable and/or novice.",
+	5:  "Miserable and/or novice.",
+	6:  "Miserable and/or novice.",
+	7:  "Average.",
+	8:  "Average.",
+	9:  "Fresh from shore leave and/or experienced.",
+	10: "Fresh from shore leave and/or experienced.",
+	11: "Prosperous/loyal and/or military training",
+	12: "Prosperous/loyal and/or military training",
+}
 
 // d66(d36)
 var vesselShipName = []string{"Banshee's Wail", "Revenant", "Void Ripper", "Mermaid's Tear", "Carrion Crow", "Executioner's Hand", "Poseidon's Rage", "Adventure's Ghost", "Widow's Revenge", "Blood Moon", "Devil's Scorn", "Gilded Parrot", "Monolith", "Black Tide", "Raven's Wrath", "Coral Corsair", "Hellspire", "Vendetta", "Crimson Tempest", "Royal Tomb", "Guillotine", "Neptune's Maiden", "Cadaver's Call", "Heart of the Sea", "Demonwake", "Bride of the Abyss", "Annihilation", "Golden Glaive", "Necrobile", "Grave Witch", "Loa's Lament", "Hunsi Kanzo", "Dragon from the Deep", "Leviathan's Flood", "Kraken's Maw", "Harlequin's Curse"}
@@ -293,18 +305,18 @@ var vesselShipName = []string{"Banshee's Wail", "Revenant", "Void Ripper", "Merm
 // d12 - roll further
 var vesselMundaneCargo = []string{"food or crops , 250s", "spices or oils, 350s", "trade goods, 400s", "livestock, 400s", "sugar, 500s", "rum, 1000s", "munitions, 2000s", "tobacco, 1000s", "wine, 2000s", "antiques, 2000s", "lumber, 1000s", "special cargo"}
 
-// d12 - roll further
+// d12
 var vesselSpecialCargo = []string{"raw silver ore, 5000s", "golden coins and treasures, 10000s", "religious leader(s)", "important prisoner(s)", "political or military figure(s)", "relics or a rare artifact, 4000s", "sea monster bones, 2500s", "exotic animals, 2000s", "d10 locked chests, 2d8 x 100s each", "d20 crates of ASH , see pg. 25", "imprisoned undead", "a sorcerer with a tome of d4 Arcane Rituals (pg. 64)"}
 
 // d8
 var vesselOptionalPlotTwist = []string{"Deadly disease on board.", "Crew are impostors.", "Crew is mute.", "The PCs know this crew.", "Everyone on board was thought to be dead.", "Ghost ship.", "They're all zombies.", "Someone on board is related to a PC's backstory."}
 
-// d12
-var derelictShipWhereIsIt = []string{"shallow waters (submerged at high tide)", "suspended on shoals (half underwater)", "beach wrecked", "adrift at sea", "anchored off the coast", "suspended on rocks or a coastal cliff", "up a dried-up riverbed", "in the middle of the jungle, forest, or desert", "drifting into port", "orbiting a maelstrom", "floating the waters that lead to the underworld", "in the nightmares of cursed sailors"}
-
 // -- VESSEL
 
 // DERELICT SHIP --
+
+// d12
+var derelictShipWhereIsIt = []string{"shallow waters (submerged at high tide)", "suspended on shoals (half underwater)", "beach wrecked", "adrift at sea", "anchored off the coast", "suspended on rocks or a coastal cliff", "up a dried-up riverbed", "in the middle of the jungle, forest, or desert", "drifting into port", "orbiting a maelstrom", "floating the waters that lead to the underworld", "in the nightmares of cursed sailors"}
 
 // d12
 var derelictShipTypeOfShip = []string{"several ships fastened together (roll d2 more times)", "sloop", "tartane", "giant jury-rigged raft", "brigantine", "frigate", "ancient vessel", "galleon", "fluyt", "man-of-war", "ship of the line", "otherworldly"}

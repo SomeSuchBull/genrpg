@@ -520,5 +520,5 @@ func RollThingOfImportance() string {
 }
 
 func (pc *PlayerCharacter) GetRandomName() {
-	pc.Name = ""
+	pc.Name = PirateName()
 }

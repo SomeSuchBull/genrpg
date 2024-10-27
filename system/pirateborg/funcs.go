@@ -98,3 +98,105 @@ func MysticalMishap() string {
 		return ""
 	}
 }
+
+type Island struct {
+	Size                     string `json:"size"`
+	Terrain                  string `json:"terrain"`
+	Vegetation               string `json:"vegetation"`
+	ProminentNaturalFeature  string `json:"prominentNaturalFeature"`
+	NotableAnimalInhabitants string `json:"notableAnimalInhabitants"`
+	Inhabitants              string `json:"inhabitants"`
+	BestPlaceToHideTreasure  string `json:"bestPlaceToHideTreasure"`
+	AnythingWorthAFortune    string `json:"anythingWorthAFortune"`
+	NaturalHazards           string `json:"naturalHazards"`
+	CurrentConflicts         string `json:"currentConflicts"`
+	Darkness                 string `json:"darkness"`
+}
+
+func (i Island) String() string {
+	return fmt.Sprintf("Size: %s\nTerrain: %s\nVegetation: %s\nProminent Natural Feature: %s\nNotable Animal Inhabitants: %s\nInhabitants: %s\nBest Place to Hide Treasure: %s\nAnything Worth a Fortune: %s\nNatural Hazards: %s\nCurrent Conflicts: %s\n"+Red("Darkness")+": %s",
+		i.Size, i.Terrain, i.Vegetation, i.ProminentNaturalFeature, i.NotableAnimalInhabitants, i.Inhabitants, i.BestPlaceToHideTreasure, i.AnythingWorthAFortune, i.NaturalHazards, i.CurrentConflicts, i.Darkness)
+}
+
+func GetIsland() Island {
+	return Island{
+		Size:                     islandSize[utils.TableDie(6)],
+		Terrain:                  islandTerrain[utils.D(6)+utils.D(6)],
+		Vegetation:               islandVegetation[utils.D(6)+utils.D(6)],
+		ProminentNaturalFeature:  islandProminentNaturalFeature[utils.D(6)+utils.D(6)],
+		NotableAnimalInhabitants: islandNotableAnimalInhabitants[utils.D(6)+utils.D(6)],
+		Inhabitants:              islandInhabitants[utils.D(6)+utils.D(6)],
+		BestPlaceToHideTreasure:  islandBestPlaceToHideTreasure[utils.D(6)+utils.D(6)],
+		AnythingWorthAFortune:    islandAnythingWorthAFortune[utils.D(6)+utils.D(6)],
+		NaturalHazards:           islandNaturalHazards[utils.D(6)+utils.D(6)],
+		CurrentConflicts:         islandCurrentConflicts[utils.D(6)+utils.D(6)],
+		Darkness:                 islandDarkness[utils.D(6)+utils.D(6)],
+	}
+}
+
+type DerelictShip struct {
+	WhereIsIt        string `json:"whereIsIt"`
+	TypeOfShip       string `json:"typeOfShip"`
+	WhatHappenedHere string `json:"whatHappenedHere"`
+	InOneOfTheRooms  string `json:"inOneOfTheRooms"`
+	OddFeature       string `json:"oddFeature"`
+	Development      string `json:"development"`
+	CurrentOccupant  string `json:"currentOccupant"`
+	OriginalCargo    string `json:"originalCargo"`
+	CargoCondition   string `json:"cargoCondition"`
+}
+
+func (ds DerelictShip) String() string {
+	return fmt.Sprintf("Where is it: %s\nType of Ship: %s\nWhat happened here: %s\nIn one of the rooms: %s\nOdd feature: %s\nDevelopment: %s\nCurrent Occupant: %s\nOriginal Cargo: %s\nCargo Condition: %s",
+		ds.WhereIsIt, ds.TypeOfShip, ds.WhatHappenedHere, ds.InOneOfTheRooms, ds.OddFeature, ds.Development, ds.CurrentOccupant, ds.OriginalCargo, ds.CargoCondition)
+}
+
+func GetDerelictShip() DerelictShip {
+	return DerelictShip{
+		WhereIsIt:        derelictShipWhereIsIt[utils.TableDie(12)],
+		TypeOfShip:       derelictShipTypeOfShip[utils.TableDie(12)],
+		WhatHappenedHere: derelictShipWhatHappenedHere[utils.TableDie(8)],
+		InOneOfTheRooms:  derelictShipInOneOfTheRooms[utils.TableDie(8)],
+		OddFeature:       derelictShipOddFeature[utils.TableDie(12)],
+		Development:      derelictShipDevelopment[utils.TableDie(8)],
+		CurrentOccupant:  derelictShipCurrentOccupant[utils.TableDie(12)],
+		OriginalCargo:    derelictShipOriginalCargo[utils.TableDie(20)],
+		CargoCondition:   derelictShipCargoCondition[utils.TableDie(6)],
+	}
+
+}
+
+type Vessel struct {
+	Class             string `json:"class"`
+	Armament          string `json:"armament"`
+	CrewQuantity      string `json:"crewQuantity"`
+	CrewQuality       string `json:"crewQuality"`
+	ShipName          string `json:"shipName"`
+	Cargo             string `json:"cargo"`
+	OptionalPlotTwist string `json:"optionalPlotTwist"`
+}
+
+func (v Vessel) String() string {
+	return fmt.Sprintf("Class: %s\nArmament: %s\nCrew Quantity: %s\nCrew Quality: %s\nShip Name: %s\nCargo: %s\nOptional Plot Twist: %s",
+		v.Class, v.Armament, v.CrewQuantity, v.CrewQuality, v.ShipName, v.Cargo, v.OptionalPlotTwist)
+}
+
+func GetVessel() Vessel {
+	cargoDie := utils.D(12)
+	var cargo string
+	if cargoDie == 12 {
+		cargo = vesselSpecialCargo[utils.TableDie(12)]
+	} else {
+		cargo = vesselMundaneCargo[cargoDie-1]
+	}
+
+	return Vessel{
+		Class:             vesselClass[utils.TableDie(10)],
+		Armament:          vesselArmament[utils.TableDie(6)],
+		CrewQuantity:      vesselCrewQuantity[utils.TableDie(6)],
+		CrewQuality:       vesselCrewQuality[utils.D(6)+utils.D(6)],
+		ShipName:          vesselShipName[utils.TableDie(36)],
+		Cargo:             cargo,
+		OptionalPlotTwist: vesselOptionalPlotTwist[utils.TableDie(8)],
+	}
+}
