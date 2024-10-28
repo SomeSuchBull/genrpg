@@ -21,7 +21,7 @@ type Rapscallion struct {
 	Weapons         []Weapon  `json:"weapons"`
 }
 
-func (pc *PlayerCharacter) NewRapscallion() {
+func NewRapscallion() PlayerClass {
 	rapscallion := &Rapscallion{
 		Lvl:         1,
 		DevilsLuck:  "d2",
@@ -36,7 +36,7 @@ func (pc *PlayerCharacter) NewRapscallion() {
 		HitDie: 8,
 	}
 	rapscallion.getStartingFeature()
-	pc.Class = rapscallion
+	return rapscallion
 }
 
 func (r *Rapscallion) GetDevilsLuck() string {

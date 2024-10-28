@@ -21,7 +21,7 @@ type Zealot struct {
 	Weapons         []Weapon  `json:"weapons"`
 }
 
-func (pc *PlayerCharacter) NewZealot() {
+func NewZealot() PlayerClass {
 	zealot := &Zealot{
 		Lvl:         1,
 		DevilsLuck:  "d4",
@@ -36,7 +36,7 @@ func (pc *PlayerCharacter) NewZealot() {
 		HitDie: 8,
 	}
 	zealot.getStartingFeature()
-	pc.Class = zealot
+	return zealot
 }
 
 func (z *Zealot) GetDevilsLuck() string {

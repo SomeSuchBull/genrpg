@@ -20,10 +20,10 @@ var stockCmd = &cobra.Command{
 	Short: "Stock a dungeon.",
 	Long:  `Stock a dungeon with monsters, traps, treasure, and other.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		switch rooms {
-		case 0:
+		switch {
+		case rooms == 0:
 			fmt.Println("Nothing to stock.")
-		case 1000:
+		case rooms > 1000:
 			fmt.Println("Too many rooms to stock, will default to 999.")
 			rooms = 999
 			fallthrough

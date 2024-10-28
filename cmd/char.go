@@ -19,7 +19,7 @@ var charCmd = &cobra.Command{
 	Short: "Generate a random character.",
 	Long:  `Generate a random character from a variety of systems. (Only Pirate Borg atm)`,
 	Run: func(cmd *cobra.Command, args []string) {
-		pc := pirateborg.NewCharacter()
+		pc := pirateborg.NewCharacter(extra)
 		fmt.Printf("%s %s\n%s %s\n%s\n%s\n",
 			pirateborg.Red("Name:"), pc.Name,
 			pirateborg.Red("Class:"), pc.Class,

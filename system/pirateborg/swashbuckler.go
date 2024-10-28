@@ -21,7 +21,7 @@ type Swashbuckler struct {
 	Weapons         []Weapon  `json:"weapons"`
 }
 
-func (pc *PlayerCharacter) NewSwashbuckler() {
+func NewSwashbuckler() PlayerClass {
 	swashbuckler := &Swashbuckler{
 		Lvl:         1,
 		DevilsLuck:  "d2",
@@ -37,7 +37,7 @@ func (pc *PlayerCharacter) NewSwashbuckler() {
 		HitDie: 10,
 	}
 	swashbuckler.getStartingFeature()
-	pc.Class = swashbuckler
+	return swashbuckler
 }
 
 func (sb *Swashbuckler) GetDevilsLuck() string {

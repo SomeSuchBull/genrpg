@@ -108,7 +108,7 @@ type Feature interface {
 
 func NewCharacter(additionalClasses ...bool) *PlayerCharacter {
 	pc := &PlayerCharacter{}
-	pc.GetClass()
+	pc.Class = GetClass(additionalClasses...)
 	pc.GetStartingStats()
 	pc.StartingHP()
 	pc.StartingWeapon()
@@ -122,25 +122,30 @@ func NewCharacter(additionalClasses ...bool) *PlayerCharacter {
 	return pc
 }
 
-func (pc *PlayerCharacter) GetClass(additionalClasses ...bool) {
+func GetClass(additionalClasses ...bool) PlayerClass {
 	res := utils.D(6)
 	if len(additionalClasses) > 0 && additionalClasses[0] {
 		res = utils.D(8)
 	}
 	switch res {
 	case 1:
-		pc.NewBrute()
+		return NewBrute()
 	case 2:
-		pc.NewRapscallion()
+		return NewRapscallion()
 	case 3:
-		pc.NewBuccaneer()
+		return NewBuccaneer()
 	case 4:
-		pc.NewSwashbuckler()
+		return NewSwashbuckler()
 	case 5:
-		pc.NewZealot()
+		return NewZealot()
 	case 6:
-		pc.NewSorcerer()
+		return NewSorcerer()
+	case 7:
+		return NewHauntedSoul()
+	case 8:
+		return NewTallTale()
 	}
+	return nil
 }
 
 func (pc *PlayerCharacter) GetStartingStats() {

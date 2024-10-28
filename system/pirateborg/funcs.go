@@ -200,3 +200,26 @@ func GetVessel() Vessel {
 		OptionalPlotTwist: vesselOptionalPlotTwist[utils.TableDie(8)],
 	}
 }
+
+type Job struct {
+	Hook          string `json:"hook"`
+	KeyNPC        string `json:"keyNPC"`
+	Requirement   string `json:"requirement"`
+	TimeRestraint string `json:"timeRestraint"`
+	Complication  string `json:"complication"`
+}
+
+func (j Job) String() string {
+	return fmt.Sprintf("Hook: %s\nKey NPC: %s\nRequirement: %s\nTime Restraint: %s\nComplication: %s",
+		j.Hook, j.KeyNPC, j.Requirement, j.TimeRestraint, j.Complication)
+}
+
+func GetJob() Job {
+	return Job{
+		Hook:          jobsHooks[utils.TableDie(20)],
+		KeyNPC:        jobsKeyNPC[utils.TableDie(10)],
+		Requirement:   jobsRequirements[utils.TableDie(6)],
+		TimeRestraint: jobsTimeRestraint[utils.TableDie(6)],
+		Complication:  jobsComplication[utils.TableDie(6)],
+	}
+}

@@ -21,7 +21,7 @@ type Sorcerer struct {
 	Weapons         []Weapon  `json:"weapons"`
 }
 
-func (pc *PlayerCharacter) NewSorcerer() {
+func NewSorcerer() PlayerClass {
 	sorcerer := &Sorcerer{
 		Lvl:         1,
 		DevilsLuck:  "d4",
@@ -36,7 +36,7 @@ func (pc *PlayerCharacter) NewSorcerer() {
 		HitDie: 8,
 	}
 	sorcerer.getStartingFeature()
-	pc.Class = sorcerer
+	return sorcerer
 }
 
 func (s *Sorcerer) GetDevilsLuck() string {

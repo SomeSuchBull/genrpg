@@ -21,7 +21,7 @@ type Buccaneer struct {
 	Weapons         []Weapon  `json:"weapons"`
 }
 
-func (pc *PlayerCharacter) NewBuccaneer() {
+func NewBuccaneer() PlayerClass {
 	buccaneer := &Buccaneer{
 		Lvl:         1,
 		DevilsLuck:  "d2",
@@ -36,7 +36,7 @@ func (pc *PlayerCharacter) NewBuccaneer() {
 		HitDie: 8,
 	}
 	buccaneer.getStartingFeature()
-	pc.Class = buccaneer
+	return buccaneer
 }
 
 func (bucc *Buccaneer) GetDevilsLuck() string {

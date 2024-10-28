@@ -27,7 +27,7 @@ func room(f func(utils.StockingContext, *string) string, ctx utils.StockingConte
 	roomNumber int, verboseOutput *string) {
 	contents := f(ctx, verboseOutput)
 	fmt.Printf("\n%s\n%s\n%s\n\n",
-		utils.RoomStyle(fmt.Sprintf("%03d %s", roomNumber+1, rooms[td(100)])),
+		utils.RoomStyle(fmt.Sprintf("%03d %s", roomNumber+1, recursiveTableRoll(rooms[td(100)], nil))),
 		fmt.Sprintf("%s | %s | %s",
 			utils.DetailStyle(recursiveTableRoll(roomThemes[td(100)], nil)),
 			utils.DetailStyle(recursiveTableRoll(roomDetails[td(100)], nil)),

@@ -20,7 +20,7 @@ type Brute struct {
 	Weapons         []Weapon  `json:"weapons"`
 }
 
-func (pc *PlayerCharacter) NewBrute() {
+func NewBrute() PlayerClass {
 	brute := &Brute{
 		Lvl:         1,
 		DevilsLuck:  "d2",
@@ -35,7 +35,7 @@ func (pc *PlayerCharacter) NewBrute() {
 		HitDie: 12,
 	}
 	brute.getStartingFeature()
-	pc.Class = brute
+	return brute
 }
 
 func (b *Brute) GetDevilsLuck() string {
