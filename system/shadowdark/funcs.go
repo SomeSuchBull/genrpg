@@ -18,12 +18,16 @@ func getTrap() string {
 }
 
 var engine = map[int]func() string{
-	0: getTreasure,
-	1: getTreasure,
-	2: getMonster,
-	3: getMonster,
-	4: getSpecial,
-	5: getTrap,
+	1:  getEmpty,
+	2:  getEmpty,
+	3:  getTrap,
+	4:  getMinorHazard,
+	5:  getSoloMonster,
+	6:  getNPC,
+	7:  getMonsterMob,
+	8:  getMajorHazard,
+	9:  getTreasure,
+	10: getBossMonster,
 }
 
 func Stocking(rooms int64) {
@@ -40,10 +44,33 @@ func getTreasure() string {
 	return "Treasure"
 }
 
+func getEmpty() string {
+	return "Empty"
+}
+
 func getMonster() string {
 	return "Monster"
 }
 
 func getSpecial() string {
 	return "Special"
+}
+
+func getMinorHazard() string {
+	return "Minor Hazard"
+}
+func getSoloMonster() string {
+	return "Solo Monster"
+}
+func getNPC() string {
+	return "NPC"
+}
+func getMonsterMob() string {
+	return "Monster Mob"
+}
+func getMajorHazard() string {
+	return "Major Hazard"
+}
+func getBossMonster() string {
+	return "Boss Monster"
 }
