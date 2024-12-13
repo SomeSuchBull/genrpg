@@ -39,6 +39,10 @@ func GeneratePirate() Pirate {
 	return pirate
 }
 
+func (p Pirate) String() string {
+	return fmt.Sprintf("Name: %s\nDescription: %s\nMorale: %d\nHP: %d\nArmor: %s", p.Name, p.Description, p.Morale, p.HP, p.Armor)
+}
+
 func PirateName() string {
 	var firstName string
 	if utils.D(2) == 1 {
@@ -163,40 +167,54 @@ func GetDerelictShip() DerelictShip {
 		OriginalCargo:    derelictShipOriginalCargo[utils.TableDie(20)],
 		CargoCondition:   derelictShipCargoCondition[utils.TableDie(6)],
 	}
+}
 
+type VesselCargo []string
+
+func (vc VesselCargo) String() string {
+	var cargo string
+	for _, c := range vc {
+		cargo += fmt.Sprintf("  - %s\n", c)
+	}
+	return cargo
 }
 
 type Vessel struct {
-	Class             string `json:"class"`
-	Armament          string `json:"armament"`
-	CrewQuantity      string `json:"crewQuantity"`
-	CrewQuality       string `json:"crewQuality"`
-	ShipName          string `json:"shipName"`
-	Cargo             string `json:"cargo"`
-	OptionalPlotTwist string `json:"optionalPlotTwist"`
+	Class             string      `json:"class"`
+	Armament          string      `json:"armament"`
+	CrewQuantity      string      `json:"crewQuantity"`
+	CrewQuality       string      `json:"crewQuality"`
+	ShipName          string      `json:"shipName"`
+	Cargo             VesselCargo `json:"cargo"`
+	OptionalPlotTwist string      `json:"optionalPlotTwist"`
 }
 
 func (v Vessel) String() string {
-	return fmt.Sprintf("Class: %s\nArmament: %s\nCrew Quantity: %s\nCrew Quality: %s\nShip Name: %s\nCargo: %s\nOptional Plot Twist: %s",
+	return fmt.Sprintf("Class: %s\nArmament: %s\nCrew Quantity: %s\nCrew Quality: %s\nShip Name: %s\nCargo:\n%sOptional Plot Twist: %s",
 		v.Class, v.Armament, v.CrewQuantity, v.CrewQuality, v.ShipName, v.Cargo, v.OptionalPlotTwist)
 }
 
 func GetVessel() Vessel {
-	cargoDie := utils.D(12)
-	var cargo string
-	if cargoDie == 12 {
-		cargo = vesselSpecialCargo[utils.TableDie(12)]
-	} else {
-		cargo = vesselMundaneCargo[cargoDie-1]
+	var originalCargo []string
+	vesselClassDie := utils.TableDie(10)
+	cargoSize := vesselClassCargo[vesselClassDie]
+	for i := 0; i < cargoSize; i++ {
+		cargoDie := utils.TableDie(12)
+		var cargo string
+		if cargoDie == 11 {
+			cargo = vesselSpecialCargo[utils.TableDie(12)]
+		} else {
+			cargo = vesselMundaneCargo[cargoDie]
+		}
+		originalCargo = append(originalCargo, cargo)
 	}
-
 	return Vessel{
-		Class:             vesselClass[utils.TableDie(10)],
+		Class:             vesselClass[vesselClassDie],
 		Armament:          vesselArmament[utils.TableDie(6)],
 		CrewQuantity:      vesselCrewQuantity[utils.TableDie(6)],
 		CrewQuality:       vesselCrewQuality[utils.D(6)+utils.D(6)],
 		ShipName:          vesselShipName[utils.TableDie(36)],
-		Cargo:             cargo,
+		Cargo:             originalCargo,
 		OptionalPlotTwist: vesselOptionalPlotTwist[utils.TableDie(8)],
 	}
 }

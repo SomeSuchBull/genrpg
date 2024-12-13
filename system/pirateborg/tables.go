@@ -278,6 +278,9 @@ var unfortunateIncidents = []string{"Your loved ones were burned alive. Revenge 
 // d10
 var vesselClass = []string{"raft", "longboat", "tartane", "sloop", "brigantine", "fluyt", "frigate", "galleon", "man-of-war", "ship of the line"}
 
+// d10
+var vesselClassCargo = []int{0, 0, 1, 2, 3, 5, 4, 6, 4, 4}
+
 // d6
 var vesselArmament = []string{"Merchant: No weapons.", "Lightly armed: reduce damage die size by one.", "Normal armament", "Normal armament", "Normal armament", "Warship: Double broadside"}
 
@@ -303,7 +306,7 @@ var vesselCrewQuality = map[int]string{
 var vesselShipName = []string{"Banshee's Wail", "Revenant", "Void Ripper", "Mermaid's Tear", "Carrion Crow", "Executioner's Hand", "Poseidon's Rage", "Adventure's Ghost", "Widow's Revenge", "Blood Moon", "Devil's Scorn", "Gilded Parrot", "Monolith", "Black Tide", "Raven's Wrath", "Coral Corsair", "Hellspire", "Vendetta", "Crimson Tempest", "Royal Tomb", "Guillotine", "Neptune's Maiden", "Cadaver's Call", "Heart of the Sea", "Demonwake", "Bride of the Abyss", "Annihilation", "Golden Glaive", "Necrobile", "Grave Witch", "Loa's Lament", "Hunsi Kanzo", "Dragon from the Deep", "Leviathan's Flood", "Kraken's Maw", "Harlequin's Curse"}
 
 // d12 - roll further
-var vesselMundaneCargo = []string{"food or crops , 250s", "spices or oils, 350s", "trade goods, 400s", "livestock, 400s", "sugar, 500s", "rum, 1000s", "munitions, 2000s", "tobacco, 1000s", "wine, 2000s", "antiques, 2000s", "lumber, 1000s", "special cargo"}
+var vesselMundaneCargo = []string{"food or crops, 250s", "spices or oils, 350s", "trade goods, 400s", "livestock, 400s", "sugar, 500s", "rum, 1000s", "munitions, 2000s", "tobacco, 1000s", "wine, 2000s", "antiques, 2000s", "lumber, 1000s", "special cargo"}
 
 // d12
 var vesselSpecialCargo = []string{"raw silver ore, 5000s", "golden coins and treasures, 10000s", "religious leader(s)", "important prisoner(s)", "political or military figure(s)", "relics or a rare artifact, 4000s", "sea monster bones, 2500s", "exotic animals, 2000s", "d10 locked chests, 2d8 x 100s each", "d20 crates of ASH , see pg. 25", "imprisoned undead", "a sorcerer with a tome of d4 Arcane Rituals (pg. 64)"}

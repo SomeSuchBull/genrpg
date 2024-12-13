@@ -65,4 +65,5 @@ func init() {
 	rootCmd.AddCommand(pb.IslandCmd)
 	rootCmd.AddCommand(pb.DerelictShipCmd)
 	rootCmd.AddCommand(pb.VesselCmd)
+	rootCmd.AddCommand(pb.PirateCmd)
 }

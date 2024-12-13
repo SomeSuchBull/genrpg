@@ -278,7 +278,7 @@ func RollForClothing(d int) Clothing {
 	case r == 3 || r == 4:
 		return Clothing{Item: Item{Name: "common clothes", Price: "2s"}}
 	case r == 5:
-		return Clothing{Item: Item{Name: "old uniform", Price: "8d"}}
+		return Clothing{Item: Item{Name: "old uniform", Price: "8s"}}
 	case r == 6:
 		return Clothing{Item: Item{Name: "fancy clothes", Price: "250s", Extra: I("You look amazing!")}, Armor: ""}
 	case r == 7:
