@@ -30,7 +30,7 @@ var stockCmd = &cobra.Command{
 		default:
 			switch {
 			case system == "sd" || system == "shadowdark":
-				shadowdark.Stocking(rooms)
+				shadowdark.Stocking(rooms, int(level))
 			default:
 				system = "knave"
 				knave.Stocking(rooms, level, verbose)
@@ -44,5 +44,5 @@ func init() {
 	rootCmd.AddCommand(stockCmd)
 
 	stockCmd.Flags().Int64VarP(&rooms, "number of rooms", "n", 1, "Number of rooms to stock.")
-	stockCmd.Flags().Int64VarP(&level, "Level of dungeon", "l", 0, "Level of dungeon to stock.")
+	stockCmd.Flags().Int64VarP(&level, "level of dungeon", "l", 0, "Level of dungeon to stock.")
 }
