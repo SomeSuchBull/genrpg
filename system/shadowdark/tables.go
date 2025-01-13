@@ -1,5 +1,31 @@
 package shadowdark
 
+import (
+	"fmt"
+	"math/rand"
+
+	"github.com/genrpg/utils"
+)
+
+type Alignment string
+
+const (
+	Lawful  Alignment = "Lawful"
+	Neutral Alignment = "Neutral"
+	Chaotic Alignment = "Chaotic"
+)
+
+type Ancestry string
+
+const (
+	DwarfAncestry    Ancestry = "Dwarf"
+	ElfAncestry      Ancestry = "Elf"
+	HalflingAncestry Ancestry = "Halfling"
+	HumanAncestry    Ancestry = "Human"
+	HalfOrcAncestry  Ancestry = "Half-Orc"
+	GoblinAncestry   Ancestry = "Goblin"
+)
+
 var traps = [3][]string{
 	// Trap
 	{"Crossbow", "Hail of needles", "Toxic gas", "Barbed net", "Rolling boulder", "Slicing blade", "Spiked pit", "Javelin", "Magical glyph", "Blast of fire", "Falling block", "Cursed statue"},
@@ -53,3 +79,130 @@ var mapsMajorHazard = []string{"Long fall", "Long fall", "Toxic gas or vapors", 
 var mapsTreasure = []string{"Hidden", "Hidden", "Guarded by monster", "Guarded by monster", "Protected by trap", "Protected by hazard"}
 var mapsNpc = []string{"Hiding", "Captive", "Captive", "Wounded", "Wounded", "Rival crawlers"}
 var mapsBossMonster = []string{"Physically strongest", "Religious leader", "Guarded by minions", "Guarded by minions", "Guarded by minions", "Supreme sorcerer"}
+
+// NPCs
+type NPC struct {
+	Ancestry   Ancestry
+	Age        string
+	Alignment  Alignment
+	Wealth     string
+	Appearance string
+	Does       string
+	Secret     string
+	Occupation string
+	Name       string
+	Identifier string
+}
+
+func (n NPC) String() string {
+	return fmt.Sprintf("%s, %s, %s\nOccupation   |Wealth     |Age        |Alignment|Appearance   |Does           |Secret\n%-13s|%-11s|%-11s|%-9s|%-13s|%-15s|%s",
+		n.Name, n.Identifier, n.Ancestry,
+		n.Occupation, n.Wealth, n.Age, n.Alignment, n.Appearance, n.Does, n.Secret)
+}
+
+func NewNPC() NPC {
+	n := NPC{
+		Ancestry:   npcAncestry[rand.Intn(len(npcAncestry))],
+		Age:        npcAge[rand.Intn(len(npcAge))],
+		Alignment:  npcAlignment[rand.Intn(len(npcAlignment))],
+		Wealth:     npcWealth[rand.Intn(len(npcWealth))],
+		Appearance: npcAppearance[rand.Intn(len(npcAppearance))],
+		Does:       npcDoes[rand.Intn(len(npcDoes))],
+		Secret:     npcSecret[rand.Intn(len(npcSecret))],
+		Occupation: npcOccupation[rand.Intn(len(npcOccupation))],
+	}
+	n.Name = npcNames[n.Ancestry][rand.Intn(len(npcNames[n.Ancestry]))]
+	n.Identifier = npcIdentifier[rand.Intn(len(npcIdentifier))]
+	return n
+}
+
+var npcAncestry = []Ancestry{HumanAncestry, HumanAncestry, HumanAncestry, HumanAncestry, ElfAncestry, ElfAncestry, DwarfAncestry, DwarfAncestry, HalflingAncestry, HalflingAncestry, HalfOrcAncestry, GoblinAncestry}
+var npcAge = []string{"Child", "Adolescent", "Adult", "Adult", "Middle-aged", "Middle-aged", "Elderly", "Ancient"}
+var npcAlignment = []Alignment{Lawful, Lawful, Lawful, Neutral, Chaotic, Chaotic}
+var npcWealth = []string{"Poor", "Standard", "Standard", "Wealthy", "Wealthy", "Extravagant"}
+var npcAppearance = []string{"Balding", "Stocky build", "Very tall", "Beauty mark", "One eye", "Braided hair", "Muscular", "White hair", "Scar on face", "Willowy build", "Sweaty", "Cleft chin", "Frail", "Big eyebrows", "Tattooed", "Floppy hat", "Gold tooth", "Six fingers", "Very short", "Large nose"}
+var npcDoes = []string{"Spits", "Always eating", "Moves quickly", "Card tricks", "Prays aloud", "Writes in diary", "Apologetic", "Slaps backs", "Drops things", "Swears oaths", "Makes puns", "Rare accent", "Easily spooked", "Forgetful", "Speaks quietly", "Twitches", "Moves slowly", "Speaks loudly", "Swaggers", "Smokes pipe"}
+var npcSecret = []string{"Hiding a fugitive", "Adores baby animals", "Obsessed with fire", "In a religious cult", "Is a half-demon", "Was a wizard's apprentice", "Needlessly picks pockets", "Has a false identity", "Afraid of storms", "Has functional gills", "In deep gambling debt", "Works as a smuggler", "Is a werewolf", "Can actually smell lies", "Cast out of wealthy family", "In love with a bartender", "Left the Thieves' Guild", "Best friends with a prince", "Retired crawler", "Has a pet basilisk"}
+var npcOccupation = []string{"Gravedigger", "Carpenter", "Scholar", "Blacksmith", "Tax collector", "Farmer", "Bartender", "Beggar", "Baker", "Cook", "Sailor", "Butcher", "Locksmith", "Cobbler", "Friar/nun", "Merchant"} // d16
+var npcNames = map[Ancestry][]string{
+	DwarfAncestry:    {"Hera", "Torin", "Ginny", "Gant", "Olga", "Dendor", "Ygrid", "Pike", "Sarda", "Brigg", "Zorli", "Yorin", "Jorgena", "Trogin", "Riga", "Barton", "Katrina", "Egrim", "Elsa", "Orgo"},
+	ElfAncestry:      {"Sarenia", "Ravos", "Imeria", "Farond", "Isolden", "Kieren", "Mirenel", "Riarden", "Allindra", "Arlomas", "Sylara", "Tyr", "Rinariel", "Saramir", "Vedana", "Elindos", "Ophelia", "Cydaros", "Tiramel", "Varond"},
+	GoblinAncestry:   {"Kog", "Dibbs", "Fronk", "Irv", "Squag", "Mort", "Vig", "Sticks", "Gorb", "Yogg", "Plok", "Zrak", "Dent", "Krik", "Mizzo", "Bort", "Nabo", "Hink", "Bree", "Kreeb"},
+	HalflingAncestry: {"Myrtle", "Robby", "Nora", "Percy", "Daisy", "Jolly", "Evelyn", "Horace", "Willie", "Gertie", "Peri", "Carlsby", "Nyx", "Kellan", "Fern", "Harlow", "Moira", "Sage", "Reenie", "Wendry"},
+	HalfOrcAncestry:  {"Troga", "Boraal", "Urgana", "Zoraal", "Scalga", "Krell", "Voraga", "Morak", "Draga", "Sorak", "Varga", "Ulgar", "Jala", "Kresh", "Zana", "Torvash", "Rokara", "Gartak", "Iskana", "Ziraak"},
+	HumanAncestry:    {"Hesta", "Matteo", "Rosalin", "Endric", "Kiara", "Yao", "Corina", "Rowan", "Hariko", "Ikam", "Mariel", "Jin", "Hana", "Lios", "Indra", "Remy", "Nura", "Vakesh", "Una", "Nabilo"},
+}
+var npcIdentifier = []string{"The Gray", "One-Eye", "The Lesser", "The Cunning", "Silvertongue", "The Outcast", "Fasthands", "The Bold", "The Elder", "The Charmer", "The Exiled", "The Wise", "Tree-Speaker", "The Craven", "The Red", "Six-Finger"}
+
+type Character struct {
+	Name     string
+	Ancestry Ancestry
+	Class    string
+}
+
+func (c Character) String() string {
+	return fmt.Sprintf("%s, %s %s", c.Name, c.Ancestry, c.Class)
+}
+
+// Rival crawlers
+type RivalParty struct {
+	Level            int
+	Alignment        Alignment
+	Characters       []Character
+	Renown           string
+	Secret           string
+	Wealth           string
+	Name             string
+	KnownFor         string
+	SignatureTactics string
+}
+
+func (r RivalParty) String() string {
+	output := fmt.Sprintf("%s, %s, LV: %d\nSignature Tactics: %s\nRenown: %s\nWealth: %s\nKnown for: %s\nSecret: %s\nCharacters:",
+		r.Name, r.Alignment, r.Level,
+		r.SignatureTactics, r.Renown, r.Wealth, r.KnownFor, r.Secret)
+	for _, c := range r.Characters {
+		output += fmt.Sprintf("\n%s", c)
+	}
+	return output
+}
+
+func NewRivalParty(level int) RivalParty {
+	r := RivalParty{
+		Level:      level,
+		Characters: make([]Character, 0),
+		Alignment:  rivalPartyAlignment[rand.Intn(len(rivalPartyAlignment))],
+		Renown:     rivalPartyRenown[rand.Intn(len(rivalPartyRenown))],
+		Secret:     rivalPartySecret[utils.TableDie(6)+utils.TableDie(6)],
+		Wealth:     rivalPartyWealth[rand.Intn(len(rivalPartyWealth))],
+		Name:       fmt.Sprintf("%s %s", rivalPartyName[0][utils.TableDie(20)], rivalPartyName[1][utils.TableDie(20)]),
+		KnownFor:   rivalPartyKnownFor[rand.Intn(len(rivalPartyKnownFor))],
+	}
+	r.SignatureTactics = rivalPartySignatureTactics[r.Alignment][utils.TableDie(4)]
+	if level == 0 {
+		r.Level = utils.D(6)
+	}
+	for i := 0; i < utils.D(4)+1; i++ {
+		char := Character{Ancestry: rivalAncestry[rand.Intn(len(rivalAncestry))], Class: rivalClass[rand.Intn(len(rivalClass))]}
+		char.Name = npcNames[char.Ancestry][utils.TableDie(20)]
+		r.Characters = append(r.Characters, char)
+	}
+	return r
+}
+
+var rivalAncestry = npcAncestry
+var rivalClass = []string{"Fighter", "Priest", "Thief", "Wizard"}
+var rivalPartyAlignment = []Alignment{Lawful, Neutral, Chaotic}
+var rivalPartyRenown = []string{"Unkown", "Locally known", "Locally known", "Widely recognized", "Widely recognized", "Extemely famous"}
+var rivalPartySecret = []string{"Betrayed an oath", "False/stolen identities", "False/stolen identities", "In debt to the Thieves' Guild", "In debt to the Thieves' Guild", "Map to major treasure", "Map to major treasure", "Suffering a curse", "Suffering a curse", "Suffering a curse", "Has a powerful patron"}
+var rivalPartyWealth = []string{"Poor", "Standard", "Standard", "Standard", "Wealthy", "Extravagant"}
+var rivalPartyName = [2][]string{
+	{"The Savage", "The Steel", "The Icy", "Hell's", "The Dread", "The Marvelous", "The Flaming", "The Lone", "The Noble", "The Mighty", "The Iron", "The Devil's", "The Emerald", "The Vigilant", "The Lightless", "The Forest", "Death's", "The Dark", "The Thundering", "The Divine"},
+	{"Wardens", "Skulls", "Guardians", "Hammers", "Rangers", "Explorers", "Moon", "Wolves", "Delvers", "Dawn", "Drakes", "Miscreants", "Scimitars", "Storm", "Trackers", "Oath", "Sentinels", "Lions", "Knights", "Hunters"},
+}
+var rivalPartyKnownFor = []string{"Defeating a dragon", "Specializing in undead", "Zealous worship of a god", "Slaying a two-headed ogre", "Going missing for a year", "Taking monster trophies", "Setting taverns on fire", "Their signature clothing", "Brashness and arrogance", "A disastrous expedition", "Dabbling in evil magic", "Their frenzied admirers", "Serving in a brutal war", "Large gambling debts", "Their pet lion", "Surviving the fall of Korint", "Finding a legendary sword", "Spying on other crawlers", "Defeating a necromancer", "Poaching treasure finds"}
+var rivalPartySignatureTactics = map[Alignment][]string{
+	Lawful:  {"Always negotiate", "Fight honorably", "Never use stealth", "Loyal followers"},
+	Neutral: {"Scout and sneak", "Follow rivals", "Cache resources", "Buy information"},
+	Chaotic: {"Ambush rivals", "Sacrifice NPCs", "Kill everything", "Target the helpless"},
+}
