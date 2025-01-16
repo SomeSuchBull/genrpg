@@ -13,12 +13,10 @@ type StockingContext struct {
 	Level int
 }
 
-func D(dieSize int) int {
-	return rand.Intn(dieSize) + 1
-}
+var TableDie = rand.Intn
 
-func TableDie(dieSize int) int {
-	return rand.Intn(dieSize)
+func D(dieSize int) int {
+	return TableDie(dieSize) + 1
 }
 
 func Chance(size int, c ...int) (happened int) {
@@ -32,9 +30,8 @@ func Chance(size int, c ...int) (happened int) {
 	return
 }
 
-func B(val string) string {
-	return chalk.Bold.TextStyle(val)
-}
+var B = chalk.Bold.TextStyle
+var I = chalk.Italic.TextStyle
 
 func RoomStyle(val string) string {
 	return chalk.Cyan.Color(B(chalk.Underline.TextStyle(val)))

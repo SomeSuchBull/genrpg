@@ -5,6 +5,7 @@ import (
 	"math"
 	"math/rand"
 	"slices"
+	"strings"
 
 	"github.com/genrpg/utils"
 )
@@ -19,7 +20,7 @@ func Stocking(rooms int64, level int) {
 		roll := utils.TableDie(10)
 		f := stockingEngine[roll]
 		roomContents += f(level, biome)
-		// roomContents += getNPC(level, biome)
+		// roomContents += getTreasure(level, biome)
 		fmt.Printf("%s %s\n", utils.RoomStyle(fmt.Sprintf("%03d", i)), roomContents)
 		// fmt.Printf("%3d %s\n", i, roomContents)
 	}
@@ -51,7 +52,84 @@ func getTrap(level int, biomes ...Biome) string {
 }
 
 func getTreasure(level int, biomes ...Biome) string {
-	return "Treasure"
+	roll := utils.TableDie(6)
+	detail := mapsTreasure[roll]
+	var encounter string
+	var treasure string
+	switch {
+	case level <= 3:
+		treasure = treasureTable03[utils.TableDie(100)]
+	case level <= 6:
+		treasure = treasureTable46[utils.TableDie(100)]
+	case level <= 9:
+		treasure = treasureTable79[utils.TableDie(100)]
+	default:
+		treasure = treasureTablePlus[utils.TableDie(100)]
+	}
+	var seed MagicItem
+	switch {
+	case strings.Contains(treasure, "+"):
+		bonus := int(treasure[strings.Index(treasure, "+")+1] - '0')
+		switch {
+		case strings.Contains(treasure, "armor"):
+			armor := &MagicItemArmor{Bonus: &bonus}
+			if strings.Contains(treasure, "mithral") {
+				armor.Mithral = true
+			}
+			seed = armor
+		case strings.Contains(treasure, "weapon"):
+			weapon := &MagicItemWeapon{Bonus: &bonus}
+			seed = weapon
+		default: // Other + magic items
+			armor := &MagicItemArmor{Bonus: &bonus}
+			if strings.Contains(treasure, "mithral") {
+				armor.Mithral = true
+			}
+			seed = armor
+		}
+	case strings.Contains(treasure, "-tier spell"):
+		seed = &MagicItemScrollWand{SpellTier: int(treasure[strings.Index(treasure, "-tier spell")-3] - '0'), Name: treasure}
+	case len(strings.Split(treasure, " (")) == 3:
+		treasureName := strings.Split(treasure, " (")[0]
+		seed = &NamedMagicItem{Name: treasureName}
+	}
+	if seed != nil {
+		if strings.Contains(treasure, "benefits") {
+			seed.HasBenefit(2)
+		} else if strings.Contains(treasure, "benefit") {
+			seed.HasBenefit()
+		}
+		if strings.Contains(treasure, "curse") {
+			seed.HasCurse()
+		}
+		var personality MagicItemPersonality
+		if strings.Contains(treasure, "virtue") {
+			personality.Trait = new(string)
+			personality.Virtue = new(string)
+		}
+		if strings.Contains(treasure, "flaw") {
+			personality.Trait = new(string)
+			personality.Flaw = new(string)
+		}
+		if personality.Trait != nil {
+			seed.SetPersonality(personality)
+		}
+		seed.Init()
+		encounter += fmt.Sprintf("%s", seed)
+	} else {
+		encounter = fmt.Sprintf("%s", treasure)
+	}
+	switch roll {
+	case 2, 3:
+		f := []func(int, ...Biome) string{getMonsterMob, getSoloMonster}[utils.TableDie(2)]
+		encounter += fmt.Sprintf("\n%s", f(level, biomes...))
+	case 4:
+		encounter += fmt.Sprintf("\n%s", getTrap(level, biomes...))
+	case 5:
+		f := []func(int, ...Biome) string{getMinorHazard, getMinorHazard, getMajorHazard}[utils.TableDie(3)]
+		encounter += fmt.Sprintf("\n%s", f(level, biomes...))
+	}
+	return fmt.Sprintf("%s, %s\n%s", utils.B("Treasure"), detail, encounter)
 }
 
 // func getSpecial(level int) string {
