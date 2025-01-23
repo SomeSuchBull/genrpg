@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -32,6 +33,7 @@ func Chance(size int, c ...int) (happened int) {
 
 var B = chalk.Bold.TextStyle
 var I = chalk.Italic.TextStyle
+var U = chalk.Underline.TextStyle
 
 func RoomStyle(val string) string {
 	return chalk.Cyan.Color(B(chalk.Underline.TextStyle(val)))
@@ -103,4 +105,23 @@ func (d *Distribution) Generate() error {
 		d.ResultDiscrete[i] = int(math.Round(d.ResultContinuos[i]))
 	}
 	return nil
+}
+
+func Splice[T any](list *[]T, index, count int) ([]T, error) {
+	removedElements := []T{}
+	if index < 0 {
+		return nil, errors.New("Index must be greater than 0")
+	}
+	if index >= len(*list) {
+		return nil, errors.New("Index must be less than the length of the list")
+	}
+	if count <= 0 {
+		return nil, errors.New("Count must be greater than 0")
+	}
+	if index+count > len(*list) {
+		count = len(*list) - index
+	}
+	removedElements = (*list)[index : index+count]
+	*list = append((*list)[:index], (*list)[index+count:]...)
+	return removedElements, nil
 }
