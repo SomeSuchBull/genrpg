@@ -9,6 +9,7 @@ type Tile string
 
 const (
 	Wall            Tile = "Wall"
+	Perimeter            = "Perimeter"
 	Floor                = "Floor"
 	SplitHorizontal      = "SplitHorizontal"
 	SplitVertical        = "SplitVertical"
@@ -17,6 +18,11 @@ const (
 
 type Point struct {
 	X, Y int
+}
+
+type BSPDoor struct {
+	Point
+	Connected bool
 }
 
 var N = Point{X: 0, Y: -1}
@@ -40,9 +46,11 @@ func (p Point) String() string {
 }
 
 type BSPRoom struct {
+	ID                            int
 	Point                         // Top-left corner
 	Width, Height, ShiftX, ShiftY int
 	ExpandedX, ExpandedY          int
+	Doors                         []BSPDoor
 }
 
 type Split struct {
@@ -66,13 +74,15 @@ type BSPDungeon struct {
 	ShiftX, ShiftY            int
 	InitialGrid               [][]Tile
 	ExpandedGrid              [][]Tile
+	PathFindingGrid           [][]int
 	Rooms                     []BSPRoom
 	Splits                    []BSPNode
 	Expanded                  bool
+	UseSplitsAsCorridors      bool
 }
 
 // Initialize dungeon grid with walls
-func NewDungeon(width, height int) *BSPDungeon {
+func NewDungeon(width, height int, expanded, useSplitsAsCorridors bool) *BSPDungeon {
 	grid := make([][]Tile, height)
 	for i := range grid {
 		grid[i] = make([]Tile, width)
@@ -80,52 +90,70 @@ func NewDungeon(width, height int) *BSPDungeon {
 			grid[i][j] = Wall
 		}
 	}
-	return &BSPDungeon{Width: width, Height: height, InitialGrid: grid}
+	return &BSPDungeon{Width: width, Height: height, InitialGrid: grid, Expanded: expanded, UseSplitsAsCorridors: useSplitsAsCorridors}
 }
 
 func (d *BSPDungeon) CreateActualGrid() {
 	grid := make([][]Tile, d.ActualHeight)
+	pathingGrid := make([][]int, d.ActualHeight)
 	for i := range grid {
 		grid[i] = make([]Tile, d.ActualWidth)
+		pathingGrid[i] = make([]int, d.ActualWidth)
 		for j := range grid[i] {
 			grid[i][j] = Wall
+			pathingGrid[i][j] = normalDijkstraWeight
 		}
 	}
 	d.ExpandedGrid = grid
+	d.PathFindingGrid = pathingGrid
 }
 
 // Carve a room into the grid
 func (d *BSPDungeon) CarveRoom(room *BSPRoom) {
 	for y := room.Y; y < room.Y+room.Height; y++ {
 		for x := room.X; x < room.X+room.Width; x++ {
+			if y == room.Y && x == room.X {
+				d.InitialGrid[y][x] = Tile(fmt.Sprint(room.ID))
+				continue
+			}
 			d.InitialGrid[y][x] = Floor
+		}
+	}
+	for y := room.ExpandedY - 1; y <= room.ExpandedY+room.Height; y++ {
+		for x := room.ExpandedX - 1; x <= room.ExpandedX+room.Width; x++ {
+			d.ExpandedGrid[y][x] = Perimeter
+			d.PathFindingGrid[y][x] = blockedDijkstraWeight
 		}
 	}
 	for y := room.ExpandedY; y < room.ExpandedY+room.Height; y++ {
 		for x := room.ExpandedX; x < room.ExpandedX+room.Width; x++ {
+			if y == room.ExpandedY && x == room.ExpandedX {
+				d.ExpandedGrid[y][x] = Tile(fmt.Sprint(room.ID))
+				continue
+			}
 			d.ExpandedGrid[y][x] = Floor
 		}
 	}
 }
 
-func (d *BSPDungeon) CarveCorridor(node *BSPNode) {
+func (d *BSPDungeon) CarveSplitCorridor(node *BSPNode) {
 	if node.Split.Type == SplitVertical {
 		x := node.Split.Points[0].X + 2*node.ShiftX + 2
 		for y := node.Split.Points[0].Y + 2*node.ShiftY; y < d.ActualHeight; y++ {
-			if d.ExpandedGrid[y][x] != Wall {
+			if d.ExpandedGrid[y][x] != Wall && d.ExpandedGrid[y][x] != Perimeter {
 				break
 			}
-			if d.ExpandedGrid[y][x] == Wall && y != 0 && y != d.ActualHeight-1 {
+			if (d.ExpandedGrid[y][x] == Wall || d.ExpandedGrid[y][x] == Perimeter) && y != 0 && y != d.ActualHeight-1 {
 				d.ExpandedGrid[y][x] = SplitVertical
 			}
 		}
 	} else if node.Split.Type == SplitHorizontal {
 		y := node.Split.Points[0].Y + 2*node.ShiftY + 2
 		for x := node.Split.Points[0].X + 2*node.ShiftX; x < d.ActualWidth; x++ {
-			if d.ExpandedGrid[y][x] != Wall {
+			if d.ExpandedGrid[y][x] != Wall && d.ExpandedGrid[y][x] != Perimeter {
 				break
 			}
-			if d.ExpandedGrid[y][x] == Wall && x != 0 && x != d.ActualWidth-1 {
+			if (d.ExpandedGrid[y][x] == Wall || d.ExpandedGrid[y][x] == Perimeter) && x != 0 && x != d.ActualWidth-1 {
 				d.ExpandedGrid[y][x] = SplitHorizontal
 			}
 		}
@@ -164,7 +192,7 @@ func SplitSpace(x, y, width, height, minSize int, d *BSPDungeon, counter *int) *
 		*counter++
 		d.InitialGrid[y+split-1][x] = Tile(fmt.Sprintf("%d", *counter))
 		for i := x + 1; i < x+width; i++ {
-			if d.InitialGrid[y+split-1][i] == Wall {
+			if d.InitialGrid[y+split-1][i] == Wall || d.InitialGrid[y+split-1][i] == Perimeter {
 				d.InitialGrid[y+split-1][i] = SplitHorizontal
 			}
 		}
@@ -185,7 +213,7 @@ func SplitSpace(x, y, width, height, minSize int, d *BSPDungeon, counter *int) *
 		*counter++
 		d.InitialGrid[y][x+split-1] = Tile(fmt.Sprintf("%d", *counter))
 		for i := y + 1; i < y+height; i++ {
-			if d.InitialGrid[i][x+split-1] == Wall {
+			if d.InitialGrid[i][x+split-1] == Wall || d.InitialGrid[i][x+split-1] == Perimeter {
 				d.InitialGrid[i][x+split-1] = SplitVertical
 			}
 		}
@@ -206,11 +234,11 @@ func SplitSpace(x, y, width, height, minSize int, d *BSPDungeon, counter *int) *
 }
 
 // Place rooms within BSP regions
-func CarveBSP(node *BSPNode, dungeon *BSPDungeon, count *int, numberOfRooms int) {
+func (d *BSPDungeon) CarveBSP(node *BSPNode, count *int, numberOfRooms int) {
 	if node == nil {
 		return
 	}
-	if node.Left == nil && node.Right == nil && *count <= numberOfRooms && rand.Intn(3) != 0 {
+	if node.Left == nil && node.Right == nil && *count <= numberOfRooms && rand.Intn(5) != 0 {
 		roomWidth := rand.Intn(node.Width/2) + node.Width/2
 		if roomWidth < 2 {
 			roomWidth = 2
@@ -219,36 +247,74 @@ func CarveBSP(node *BSPNode, dungeon *BSPDungeon, count *int, numberOfRooms int)
 		if roomHeight < 2 {
 			roomHeight = 2
 		}
+		if roomHeight > roomWidth && float64(roomHeight)/float64(roomWidth) > 3 {
+			roomHeight = 3 * roomWidth
+		}
+		if roomWidth > roomHeight && float64(roomWidth)/float64(roomHeight) > 3 {
+			roomWidth = 3 * roomHeight
+		}
 		x := node.X + rand.Intn(node.Width-roomWidth)
 		y := node.Y + rand.Intn(node.Height-roomHeight)
-
+		expandedY := 1 + y
+		expandedX := 1 + x
+		if d.Expanded {
+			expandedY += 2 * node.ShiftY
+			expandedX += 2 * node.ShiftX
+		}
+		*count++
 		room := BSPRoom{
+			ID:    *count,
 			Point: Point{X: x, Y: y}, Width: roomWidth, Height: roomHeight,
 			ShiftX: node.ShiftX, ShiftY: node.ShiftY,
-			ExpandedY: 1 + y + 2*node.ShiftY, ExpandedX: 1 + x + 2*node.ShiftX,
+			ExpandedY: expandedY, ExpandedX: expandedX,
+			Doors: []BSPDoor{},
 		}
-		dungeon.Rooms = append(dungeon.Rooms, room)
-		dungeon.CarveRoom(&room)
-		*count++
+		d.Rooms = append(d.Rooms, room)
+		d.CarveRoom(&room)
 		return
 	}
-	dungeon.CarveCorridor(node)
-	CarveBSP(node.Left, dungeon, count, numberOfRooms)
-	CarveBSP(node.Right, dungeon, count, numberOfRooms)
+	if d.UseSplitsAsCorridors {
+		d.CarveSplitCorridor(node)
+	}
+	d.CarveBSP(node.Left, count, numberOfRooms)
+	d.CarveBSP(node.Right, count, numberOfRooms)
 }
 
-func (d *BSPDungeon) PlaceDoors() {
-	for _, room := range d.Rooms {
-		door, direction := d.randomDoorDirection(room)
-		// door, _ := d.randomDoorDirection(room)
-		d.ExpandedGrid[door.Y][door.X] = Door
-		d.ExpandCorridor(door, direction)
+func (d *BSPDungeon) PlaceBSPDoors() {
+	for i, room := range d.Rooms {
+		doorPoint, direction := d.randomDoorDirection(room)
+		usedDirections := []Point{}
+		for {
+			d.ExpandedGrid[doorPoint.Y][doorPoint.X] = Door
+			d.PathFindingGrid[doorPoint.Y][doorPoint.X] = room.ID + 1
+			d.Rooms[i].Doors = append(d.Rooms[i].Doors, BSPDoor{Point: doorPoint, Connected: false})
+			if d.UseSplitsAsCorridors {
+				d.ExpandToSplitCorridor(doorPoint, direction)
+				break
+			} else {
+				usedDirections = append(usedDirections, direction)
+				if len(usedDirections) == 4 {
+					break
+				}
+				doorPoint, direction = d.randomDoorDirection(room)
+				breaking := false
+				for _, usedDirection := range usedDirections {
+					if direction == usedDirection {
+						breaking = true
+						break
+					}
+				}
+				if breaking {
+					break
+				}
+			}
+		}
 	}
 }
 
-func (d *BSPDungeon) ExpandCorridor(previousPoint Point, direction Point) {
+func (d *BSPDungeon) ExpandToSplitCorridor(previousPoint Point, direction Point) {
 	currentPoint := Point{X: previousPoint.X + direction.X, Y: previousPoint.Y + direction.Y}
-	if d.ExpandedGrid[currentPoint.Y][currentPoint.X] == Wall {
+	if d.ExpandedGrid[currentPoint.Y][currentPoint.X] == Wall || d.ExpandedGrid[currentPoint.Y][currentPoint.X] == Perimeter {
 		switch direction {
 		case N:
 			d.ExpandedGrid[currentPoint.Y][currentPoint.X] = SplitVertical
@@ -259,7 +325,7 @@ func (d *BSPDungeon) ExpandCorridor(previousPoint Point, direction Point) {
 		case W:
 			d.ExpandedGrid[currentPoint.Y][currentPoint.X] = SplitHorizontal
 		}
-		d.ExpandCorridor(currentPoint, direction)
+		d.ExpandToSplitCorridor(currentPoint, direction)
 	}
 }
 
@@ -284,10 +350,11 @@ func (d *BSPDungeon) randomDoorDirection(room BSPRoom) (Point, Point) {
 		point := Point{X: randomDoor[0].X, Y: randomDoor[0].Y}
 		for {
 			point = Point{X: point.X + randomDoor[1].X, Y: point.Y + randomDoor[1].Y}
-			if point.X == d.ActualWidth || point.Y == d.ActualHeight {
+			if point.X == d.ActualWidth || point.Y == d.ActualHeight ||
+				point.X < 0 || point.Y < 0 {
 				break
 			}
-			if d.ExpandedGrid[point.Y][point.X] != Wall {
+			if d.ExpandedGrid[point.Y][point.X] != Wall && d.ExpandedGrid[point.Y][point.X] != Perimeter {
 				breaking = true
 				break
 			}
@@ -305,23 +372,44 @@ func (d *BSPDungeon) randomDoorDirection(room BSPRoom) (Point, Point) {
 	return randomDoor[0], randomDoor[1]
 }
 
+// This is fixed, but I'm still not satisfied
+// I think this is more of a bsp problem, the cells are too far removed
+func (d *BSPDungeon) CarveDijkstraCorridors() {
+	for _, room := range d.Rooms {
+		for _, door := range room.Doors {
+			start := Point{X: door.X, Y: door.Y}
+			_, _, path := dijkstraFindNearest(d.PathFindingGrid, start, room.ID+1)
+			for _, point := range path {
+				if d.ExpandedGrid[point.Y][point.X] == Wall || d.ExpandedGrid[point.Y][point.X] == Perimeter {
+					d.ExpandedGrid[point.Y][point.X] = Floor
+					d.PathFindingGrid[point.Y][point.X] = room.ID + 1
+				}
+			}
+		}
+	}
+}
+
 func NewBSPDungeon(width, height, minSize, numberOfRooms int) *BSPDungeon {
-	d := NewDungeon(width, height)
+	d := NewDungeon(width, height, false, false)
 	counter := new(int)
 	root := SplitSpace(0, 0, width, height, minSize, d, counter)
 	d.ShiftX = CalculateShiftX(root, 0)
 	d.ShiftY = CalculateShiftY(root, 0)
 	d.ActualWidth = d.Width + 2
 	d.ActualHeight = d.Height + 2
-	// if d.Expanded {
-	d.ActualWidth += 2 * d.ShiftX
-	d.ActualHeight += 2 * d.ShiftY
-	// }
+	if d.Expanded {
+		d.ActualWidth += 2 * d.ShiftX
+		d.ActualHeight += 2 * d.ShiftY
+	}
 	d.CreateActualGrid()
 	count := new(int)
-	CarveBSP(root, d, count, numberOfRooms)
-	d.PlaceDoors()
-	d.RemoveDeadEnds()
+	d.CarveBSP(root, count, numberOfRooms)
+	d.PlaceBSPDoors()
+	// d.Print()
+	if !d.UseSplitsAsCorridors {
+		d.CarveDijkstraCorridors()
+	}
+	d.RemoveBSPDeadEnds()
 	d.Print()
 	// printTreeSpatially(root, 0, 2)
 	// GetShiftY(root)
@@ -338,39 +426,50 @@ func NewBSPDungeon(width, height, minSize, numberOfRooms int) *BSPDungeon {
 }
 
 func (d *BSPDungeon) Print() {
-	for _, row := range d.InitialGrid {
+	// for _, row := range d.InitialGrid {
+	// 	for _, cell := range row {
+	// 		if cell == Wall {
+	// 			print(". ")
+	// 		} else if cell == Floor {
+	// 			print("█ ")
+	// 		} else if cell == SplitHorizontal {
+	// 			print("— ")
+	// 		} else if cell == SplitVertical {
+	// 			print("| ")
+	// 		} else if cell == Door {
+	// 			print("D ")
+	// 		} else {
+	// 			print(fmt.Sprintf("%-2s", cell))
+	// 		}
+	// 	}
+	// 	println()
+	// }
+	// println()
+	for _, row := range d.ExpandedGrid {
 		for _, cell := range row {
-			if cell == Wall {
-				print(" .")
+			// if cell == Wall || cell == Perimeter {
+			if cell == Wall || cell == Perimeter {
+				print(". ")
 			} else if cell == Floor {
-				print(" █")
+				print("█ ")
 			} else if cell == SplitHorizontal {
-				print("——")
+				print("— ")
 			} else if cell == SplitVertical {
-				print(" |")
+				print("| ")
 			} else if cell == Door {
-				print(" D")
+				print("D ")
 			} else {
-				print(fmt.Sprintf("%2s", cell))
+				print(fmt.Sprintf("%-2s", cell))
 			}
 		}
 		println()
 	}
-	println()
-	for _, row := range d.ExpandedGrid {
+	for _, row := range d.PathFindingGrid {
 		for _, cell := range row {
-			if cell == Wall {
-				print(" .")
-			} else if cell == Floor {
-				print(" █")
-			} else if cell == SplitHorizontal {
-				print("——")
-			} else if cell == SplitVertical {
-				print(" |")
-			} else if cell == Door {
-				print(" D")
+			if cell == blockedDijkstraWeight {
+				print("█ ")
 			} else {
-				print(fmt.Sprintf("%2s", cell))
+				print(fmt.Sprintf("%-2d", cell))
 			}
 		}
 		println()
@@ -439,7 +538,7 @@ func CalculateShiftY(node *BSPNode, previousShift int) int {
 	}
 }
 
-func (d *BSPDungeon) RemoveDeadEnds() {
+func (d *BSPDungeon) RemoveBSPDeadEnds() {
 	for y := 1; y < d.ActualHeight-1; y++ {
 		for x := 1; x < d.ActualWidth-1; x++ {
 			if d.ExpandedGrid[y][x] == SplitHorizontal || d.ExpandedGrid[y][x] == SplitVertical {
@@ -450,7 +549,7 @@ func (d *BSPDungeon) RemoveDeadEnds() {
 }
 
 func (d *BSPDungeon) collapseDeadEnd(point Point) {
-	if d.ExpandedGrid[point.Y][point.X] == Wall {
+	if d.ExpandedGrid[point.Y][point.X] == Wall || d.ExpandedGrid[point.Y][point.X] == Perimeter {
 		return
 	}
 	for direction, deadEnd := range deadEnds {
@@ -463,7 +562,7 @@ func (d *BSPDungeon) collapseDeadEnd(point Point) {
 
 func (d *BSPDungeon) checkDeadEnd(point Point, deadEnd []Point) bool {
 	for _, direction := range deadEnd {
-		if d.ExpandedGrid[point.Y+direction.Y][point.X+direction.X] != Wall {
+		if d.ExpandedGrid[point.Y+direction.Y][point.X+direction.X] != Wall && d.ExpandedGrid[point.Y+direction.Y][point.X+direction.X] != Perimeter {
 			return false
 		}
 	}
