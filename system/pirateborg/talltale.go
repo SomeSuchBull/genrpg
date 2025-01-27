@@ -101,7 +101,6 @@ func (tt *TallTale) Level() int {
 	return tt.AdditionalClass.Level()
 }
 
-// TODO: decide if this is something even worth pursuing
 func (tt *TallTale) LevelUp() {
 	if tt.Die == 3 {
 		return

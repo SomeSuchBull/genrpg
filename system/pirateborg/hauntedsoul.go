@@ -77,7 +77,6 @@ func (hs *HauntedSoul) Level() int {
 	return hs.AdditionalClass.Level()
 }
 
-// TODO: decide if this is something even worth pursuing
 func (hs *HauntedSoul) LevelUp() {
 	hs.AdditionalClass.LevelUp()
 }

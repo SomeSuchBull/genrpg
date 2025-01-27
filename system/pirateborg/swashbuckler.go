@@ -78,7 +78,6 @@ func (sb *Swashbuckler) Level() int {
 	return sb.Lvl
 }
 
-// TODO: decide if this is something even worth pursuing
 func (sb *Swashbuckler) LevelUp() {}
 
 func (sb *Swashbuckler) GetItems() []Item {

@@ -759,9 +759,6 @@ func (d *DumbDungeon) stairEnds() []map[string]any {
 }
 
 func (d *DumbDungeon) CleanDungeon() {
-	// TODO: clean this up a lot more
-	// Consider completely reworking the corridor generation
-	// right now there is no rhyme or reason to it, it just goes everywhere
 	if d.Seed.RemoveDeadEnds > 0 {
 		d.removeDeadEnds()
 	}

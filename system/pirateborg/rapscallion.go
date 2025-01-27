@@ -77,7 +77,6 @@ func (r *Rapscallion) Level() int {
 	return r.Lvl
 }
 
-// TODO: decide if this is something even worth pursuing
 func (r *Rapscallion) LevelUp() {}
 
 func (r *Rapscallion) GetItems() []Item {

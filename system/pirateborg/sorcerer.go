@@ -77,7 +77,6 @@ func (s *Sorcerer) Level() int {
 	return s.Lvl
 }
 
-// TODO: decide if this is something even worth pursuing
 func (s *Sorcerer) LevelUp() {}
 
 func (s *Sorcerer) GetItems() []Item {

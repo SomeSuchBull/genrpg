@@ -76,7 +76,6 @@ func (b *Brute) Level() int {
 	return b.Lvl
 }
 
-// TODO: decide if this is something even worth pursuing
 func (b *Brute) LevelUp() {}
 
 func (b *Brute) GetItems() []Item {

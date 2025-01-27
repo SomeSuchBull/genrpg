@@ -77,7 +77,6 @@ func (bucc *Buccaneer) Level() int {
 	return bucc.Lvl
 }
 
-// TODO: decide if this is something even worth pursuing
 func (bucc *Buccaneer) LevelUp() {}
 
 func (bucc *Buccaneer) GetItems() []Item {

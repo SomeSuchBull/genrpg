@@ -77,7 +77,6 @@ func (z *Zealot) Level() int {
 	return z.Lvl
 }
 
-// TODO: decide if this is something even worth pursuing
 func (z *Zealot) LevelUp() {}
 
 func (z *Zealot) GetItems() []Item {
