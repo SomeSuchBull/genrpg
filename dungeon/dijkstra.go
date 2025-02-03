@@ -12,10 +12,24 @@ type Node struct {
 }
 
 const (
-	blockedDijkstraWeight = -1
-	neutralDijkstraWeight = 0
-	normalDijkstraWeight  = 1
+	blockedDijkstraWeight  = -1
+	neutralDijkstraWeight  = 0
+	normalDijkstraWeight   = 1
+	corridorDijkstraWeight = 2
 )
+
+var N = Point{X: 0, Y: -1}
+var NE = Point{X: 1, Y: -1}
+var E = Point{X: 1, Y: 0}
+var SE = Point{X: 1, Y: 1}
+var S = Point{X: 0, Y: 1}
+var SW = Point{X: -1, Y: 1}
+var W = Point{X: -1, Y: 0}
+var NW = Point{X: -1, Y: -1}
+
+var directions = []Point{N, W, E, S}
+var dirMap = map[Point]int{N: 1, W: 2, E: 3, S: 4}
+var oppositeDirections = map[Point]Point{N: S, E: W, W: E, S: N}
 
 type PriorityQueue []Node
 
@@ -42,28 +56,29 @@ func (pq *PriorityQueue) Pop() interface{} {
 	return item
 }
 
-func isValid(x, y, rows, cols, wrongWeight int, grid [][]int) bool {
+func isValid(x, y, rows, cols, wrongWeight int, grid [][]Cell) bool {
 	if x < 0 || y < 0 || y >= rows || x >= cols {
 		return false
 	}
-	if grid[y][x] == blockedDijkstraWeight || grid[y][x] == wrongWeight {
+	if grid[y][x].PathingValue == blockedDijkstraWeight || grid[y][x].ID == wrongWeight {
 		return false
 	}
 	return true
 }
 
-func dijkstraFindNearest(grid [][]int, start Point, startingDijkstraWeight int) (int, Point, []Point) {
+func dijkstraFindNearest(d BSPDungeon, start Point, originID int) (int, Point, []Point) {
+	grid := d.ExpandedGrid
 	rows := len(grid)
 	cols := len(grid[0])
-	directions := []Point{N, E, W, S}
-	oppositeDirections := map[Point]Point{N: S, E: W, W: E, S: N}
 
 	distance := make([][]int, rows)
 	previous := make([][]Point, rows)
 	for i := range distance {
+		// for i := range previous {
 		distance[i] = make([]int, cols)
 		previous[i] = make([]Point, cols)
 		for j := range distance[i] {
+			// for j := range previous[i] {
 			distance[i][j] = math.MaxInt32
 			previous[i][j] = Point{-1, -1}
 		}
@@ -74,21 +89,31 @@ func dijkstraFindNearest(grid [][]int, start Point, startingDijkstraWeight int) 
 	heap.Init(pq)
 	heap.Push(pq, Node{start, 0, Point{-1, -1}})
 
+	starting := true
 	for pq.Len() > 0 {
 		node := heap.Pop(pq).(Node)
 		currentPoint := node.point
 		currentDist := node.distance
 		// previousDir := node.previousDirection
 
-		if grid[currentPoint.Y][currentPoint.X] != startingDijkstraWeight &&
-			grid[currentPoint.Y][currentPoint.X] != normalDijkstraWeight &&
-			grid[currentPoint.Y][currentPoint.X] != blockedDijkstraWeight &&
+		if !starting && grid[currentPoint.Y][currentPoint.X].PathingValue == originID+1 {
+			continue
+		}
+		starting = false
+
+		if grid[currentPoint.Y][currentPoint.X].ID != originID &&
+			grid[currentPoint.Y][currentPoint.X].PathingValue != normalDijkstraWeight &&
+			grid[currentPoint.Y][currentPoint.X].PathingValue != blockedDijkstraWeight &&
 			currentPoint != start {
-			path := []Point{}
-			for p := currentPoint; p != (Point{-1, -1}); p = previous[p.Y][p.X] {
-				path = append([]Point{p}, path...)
+			if !d.Corridors[grid[currentPoint.Y][currentPoint.X].CorridorID][originID] {
+				path := []Point{}
+				for p := currentPoint; p != (Point{-1, -1}); p = previous[p.Y][p.X] {
+					path = append([]Point{p}, path...)
+				}
+				return currentDist, currentPoint, path
+			} else {
+				continue
 			}
-			return currentDist, currentPoint, path
 		}
 
 		for _, dir := range directions {
@@ -97,8 +122,8 @@ func dijkstraFindNearest(grid [][]int, start Point, startingDijkstraWeight int) 
 			}
 			nx, ny := currentPoint.X+dir.X, currentPoint.Y+dir.Y
 
-			if isValid(nx, ny, rows, cols, startingDijkstraWeight, grid) {
-				newDist := currentDist + grid[ny][nx]
+			if isValid(nx, ny, rows, cols, originID, grid) {
+				newDist := currentDist + 1
 				if newDist < distance[ny][nx] {
 					distance[ny][nx] = newDist
 					previous[ny][nx] = currentPoint

@@ -42,7 +42,7 @@ var mapStyles = map[string]struct {
 	},
 }
 
-type Cell struct {
+type DumbCell struct {
 	Blocked, Room, Corridor, Perimeter, Entrance                   bool
 	Arch, Door, Locked, Trapped, Secret, Portc, StairDown, StairUp bool
 	ID                                                             int
@@ -54,27 +54,27 @@ type RoomData struct {
 	Doors                                         map[string][]map[string]any
 }
 
-func NewCell() *Cell {
-	return &Cell{}
+func NewCell() *DumbCell {
+	return &DumbCell{}
 }
 
 type Proto struct {
 	I, J, Height, Width *int
 }
 
-func (c *Cell) OpenSpace() bool {
+func (c *DumbCell) OpenSpace() bool {
 	return c.Room || c.Corridor
 }
 
-func (c *Cell) DoorSpace() bool {
+func (c *DumbCell) DoorSpace() bool {
 	return c.Arch || c.Door || c.Locked || c.Trapped || c.Secret || c.Portc
 }
 
-func (c *Cell) Espace() bool {
+func (c *DumbCell) Espace() bool {
 	return c.Entrance || c.DoorSpace()
 }
 
-func (c *Cell) NotEspace() {
+func (c *DumbCell) NotEspace() {
 	c.Entrance = false
 	c.Arch = false
 	c.Door = false
@@ -84,23 +84,23 @@ func (c *Cell) NotEspace() {
 	c.Portc = false
 }
 
-func (c *Cell) Stairs() bool {
+func (c *DumbCell) Stairs() bool {
 	return c.StairDown || c.StairUp
 }
 
-func (c *Cell) BlockRoom() bool {
+func (c *DumbCell) BlockRoom() bool {
 	return c.Room || c.Blocked
 }
 
-func (c *Cell) BlockCorridor() bool {
+func (c *DumbCell) BlockCorridor() bool {
 	return c.Corridor || c.Perimeter || c.Blocked
 }
 
-func (c *Cell) BlockDoor() bool {
+func (c *DumbCell) BlockDoor() bool {
 	return c.DoorSpace() || c.Blocked
 }
 
-func (c *Cell) IsOnlyCorridor() bool {
+func (c *DumbCell) IsOnlyCorridor() bool {
 	return c.Corridor && !(c.Perimeter || c.Entrance ||
 		c.Arch || c.Door || c.Locked || c.Trapped || c.Secret || c.Portc ||
 		c.StairDown || c.StairUp)
@@ -161,8 +161,6 @@ var closeEnd = map[string]map[string]any{
 	},
 }
 
-var directions = []string{"E", "N", "S", "W"}
-
 type SeedOptions struct {
 	Seed                                                      int64
 	NRows, NCols, RoomMin, RoomMax, AddStairs, RemoveDeadEnds int
@@ -188,16 +186,16 @@ func getOptions() *SeedOptions {
 type DumbDungeon struct {
 	Seed                                                                          SeedOptions
 	Ni, Nj, MaxRow, MaxCol, NRooms, RoomBase, RoomRadix, LastRoomID, NRows, NCols int
-	Cells                                                                         [][]*Cell
+	Cells                                                                         [][]*DumbCell
 	Rooms                                                                         map[int]*RoomData
 	Stairs, Doors                                                                 []map[string]any
 }
 
 // TODO: Implement mask - dungeon shape
-func initCells(nRows, nCols int) [][]*Cell {
-	cells := make([][]*Cell, nRows)
+func initCells(nRows, nCols int) [][]*DumbCell {
+	cells := make([][]*DumbCell, nRows)
 	for i := 0; i < nRows; i++ {
-		cells[i] = make([]*Cell, nCols)
+		cells[i] = make([]*DumbCell, nCols)
 		for j := 0; j < nCols; j++ {
 			cells[i][j] = NewCell()
 		}
@@ -569,7 +567,7 @@ func (d *DumbDungeon) DoorSills(room *RoomData) []map[string]any {
 	return doorSills
 }
 
-func checkSill(cells [][]*Cell, room *RoomData, r, c int, dir string) map[string]any {
+func checkSill(cells [][]*DumbCell, room *RoomData, r, c int, dir string) map[string]any {
 	doorR := r + directionI[dir]
 	doorC := c + directionJ[dir]
 	doorCell := cells[doorR][doorC]
