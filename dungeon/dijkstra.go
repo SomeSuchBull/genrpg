@@ -3,6 +3,7 @@ package dungeon
 import (
 	"container/heap"
 	"math"
+	"slices"
 )
 
 type Node struct {
@@ -56,17 +57,20 @@ func (pq *PriorityQueue) Pop() interface{} {
 	return item
 }
 
-func isValid(x, y, rows, cols, wrongWeight int, grid [][]Cell) bool {
+func isValid(x, y, rows, cols, wrongWeight, doorID int, grid [][]Cell) bool {
 	if x < 0 || y < 0 || y >= rows || x >= cols {
 		return false
 	}
-	if grid[y][x].PathingValue == blockedDijkstraWeight || grid[y][x].ID == wrongWeight {
+	if grid[y][x].PathValue == blockedDijkstraWeight || grid[y][x].ID == wrongWeight {
+		return false
+	}
+	if grid[y][x].DoorPerimeter.DoorID != doorID && grid[y][x].DoorPerimeter.RoomID == wrongWeight {
 		return false
 	}
 	return true
 }
 
-func dijkstraFindNearest(d BSPDungeon, start Point, originID int) (int, Point, []Point) {
+func dijkstraFindNearest(d BSPDungeon, start Point, originID, doorID int) (int, Point, []Point) {
 	grid := d.ExpandedGrid
 	rows := len(grid)
 	cols := len(grid[0])
@@ -96,16 +100,17 @@ func dijkstraFindNearest(d BSPDungeon, start Point, originID int) (int, Point, [
 		currentDist := node.distance
 		// previousDir := node.previousDirection
 
-		if !starting && grid[currentPoint.Y][currentPoint.X].PathingValue == originID+1 {
+		if !starting && grid[currentPoint.Y][currentPoint.X].PathValue == originID+1 {
 			continue
 		}
 		starting = false
 
 		if grid[currentPoint.Y][currentPoint.X].ID != originID &&
-			grid[currentPoint.Y][currentPoint.X].PathingValue != normalDijkstraWeight &&
-			grid[currentPoint.Y][currentPoint.X].PathingValue != blockedDijkstraWeight &&
+			grid[currentPoint.Y][currentPoint.X].PathValue != normalDijkstraWeight &&
+			grid[currentPoint.Y][currentPoint.X].PathValue != blockedDijkstraWeight &&
 			currentPoint != start {
-			if !d.Corridors[grid[currentPoint.Y][currentPoint.X].CorridorID][originID] {
+			if !d.Corridors[grid[currentPoint.Y][currentPoint.X].CorridorID][originID] &&
+				!slices.Contains(d.Rooms[originID].ConnectedRooms, d.ExpandedGrid[currentPoint.Y][currentPoint.X].ID) {
 				path := []Point{}
 				for p := currentPoint; p != (Point{-1, -1}); p = previous[p.Y][p.X] {
 					path = append([]Point{p}, path...)
@@ -122,7 +127,7 @@ func dijkstraFindNearest(d BSPDungeon, start Point, originID int) (int, Point, [
 			}
 			nx, ny := currentPoint.X+dir.X, currentPoint.Y+dir.Y
 
-			if isValid(nx, ny, rows, cols, originID, grid) {
+			if isValid(nx, ny, rows, cols, originID, doorID, grid) {
 				newDist := currentDist + 1
 				if newDist < distance[ny][nx] {
 					distance[ny][nx] = newDist

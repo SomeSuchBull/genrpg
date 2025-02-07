@@ -1,8 +1,10 @@
 package dungeon
 
 import (
+	"container/list"
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 type Tile string
@@ -17,11 +19,17 @@ const (
 )
 
 type Cell struct {
-	Tile         Tile
-	PathingValue int
-	ID           int
-	CorridorID   int
-	Connected    bool
+	Tile          Tile
+	PathValue     int
+	ID            int
+	CorridorID    int
+	Connected     bool
+	DoorPerimeter DoorPerimeter
+}
+
+type DoorPerimeter struct {
+	DoorID int
+	RoomID int
 }
 
 type Point struct {
@@ -31,6 +39,7 @@ type Point struct {
 type BSPDoor struct {
 	Point
 	Direction Point
+	ID        int
 }
 
 var deadEnds = map[Point][]Point{
@@ -50,6 +59,7 @@ type BSPRoom struct {
 	Width, Height, ShiftX, ShiftY int
 	ExpandedX, ExpandedY          int
 	Doors                         []BSPDoor
+	ConnectedRooms                []int
 }
 
 type Split struct {
@@ -74,7 +84,7 @@ type BSPDungeon struct {
 	ShiftX, ShiftY            int
 	InitialGrid               [][]Tile
 	ExpandedGrid              [][]Cell
-	Rooms                     []BSPRoom
+	Rooms                     map[int]*BSPRoom
 	Splits                    []BSPNode
 	Expanded                  bool
 	UseSplitsAsCorridors      bool
@@ -90,7 +100,7 @@ func NewDungeon(width, height int, expanded, useSplitsAsCorridors bool) *BSPDung
 		}
 	}
 	return &BSPDungeon{Width: width, Height: height, InitialGrid: grid, Expanded: expanded, UseSplitsAsCorridors: useSplitsAsCorridors,
-		Corridors: map[int]map[int]bool{}}
+		Corridors: map[int]map[int]bool{}, Rooms: map[int]*BSPRoom{}}
 }
 
 func (d *BSPDungeon) CreateActualGrid() {
@@ -98,7 +108,7 @@ func (d *BSPDungeon) CreateActualGrid() {
 	for i := range grid {
 		grid[i] = make([]Cell, d.ActualWidth)
 		for j := range grid[i] {
-			cell := Cell{Tile: Wall, PathingValue: normalDijkstraWeight}
+			cell := Cell{Tile: Wall, PathValue: normalDijkstraWeight}
 			grid[i][j] = cell
 		}
 	}
@@ -119,7 +129,7 @@ func (d *BSPDungeon) CarveRoom(room *BSPRoom) {
 	for y := room.ExpandedY - 1; y <= room.ExpandedY+room.Height; y++ {
 		for x := room.ExpandedX - 1; x <= room.ExpandedX+room.Width; x++ {
 			d.ExpandedGrid[y][x].Tile = Perimeter
-			d.ExpandedGrid[y][x].PathingValue = blockedDijkstraWeight
+			d.ExpandedGrid[y][x].PathValue = blockedDijkstraWeight
 		}
 	}
 	for y := room.ExpandedY; y < room.ExpandedY+room.Height; y++ {
@@ -266,7 +276,7 @@ func (d *BSPDungeon) CarveBSP(node *BSPNode, count *int, numberOfRooms int) {
 			ExpandedY: expandedY, ExpandedX: expandedX,
 			Doors: []BSPDoor{},
 		}
-		d.Rooms = append(d.Rooms, room)
+		d.Rooms[*count] = &room
 		d.CarveRoom(&room)
 		return
 	}
@@ -278,19 +288,36 @@ func (d *BSPDungeon) CarveBSP(node *BSPNode, count *int, numberOfRooms int) {
 }
 
 func (d *BSPDungeon) PlaceBSPDoors() {
-	for i, room := range d.Rooms {
-		doorPoint, direction := d.randomDoorDirection(room)
+	for _, room := range d.Rooms {
 		usedDirections := []Point{}
+		doorID := 1
 		for {
-			d.ExpandedGrid[doorPoint.Y][doorPoint.X].Tile = Door
-			d.ExpandedGrid[doorPoint.Y][doorPoint.X].ID = room.ID
-			d.ExpandedGrid[doorPoint.Y][doorPoint.X].PathingValue = room.ID + 1
-			if d.ExpandedGrid[doorPoint.Y+direction.Y][doorPoint.X+direction.X].PathingValue == 1 {
-				d.ExpandedGrid[doorPoint.Y+direction.Y][doorPoint.X+direction.X].PathingValue = room.ID + 1
-				d.ExpandedGrid[doorPoint.Y+direction.Y][doorPoint.X+direction.X].Tile = Floor
-				d.ExpandedGrid[doorPoint.Y+direction.Y][doorPoint.X+direction.X].ID = room.ID
+			doorPoint, direction := d.randomDoorDirection(*room)
+			breaking := false
+			for _, usedDirection := range usedDirections {
+				if direction == usedDirection {
+					breaking = true
+					break
+				}
 			}
-			d.Rooms[i].Doors = append(d.Rooms[i].Doors, BSPDoor{Point: doorPoint, Direction: direction})
+			if breaking {
+				break
+			}
+			doorCell := &d.ExpandedGrid[doorPoint.Y][doorPoint.X]
+			doorCell.Tile = Door
+			doorCell.ID = room.ID
+			doorCell.PathValue = room.ID + 1
+			extraY, extraX := doorPoint.Y+direction.Y, doorPoint.X+direction.X
+			extraCell := &d.ExpandedGrid[extraY][extraX]
+			if extraCell.PathValue == 1 {
+				extraCell.PathValue = room.ID + 1
+				extraCell.Tile = Floor
+				extraCell.ID = room.ID
+				for _, dir := range deadEnds[oppositeDirections[direction]] {
+					d.ExpandedGrid[extraY+dir.Y][extraX+dir.X].DoorPerimeter = DoorPerimeter{DoorID: doorID, RoomID: room.ID}
+				}
+			}
+			room.Doors = append(room.Doors, BSPDoor{Point: doorPoint, Direction: direction, ID: doorID})
 			if d.UseSplitsAsCorridors {
 				d.ExpandToSplitCorridor(doorPoint, direction)
 				break
@@ -299,20 +326,10 @@ func (d *BSPDungeon) PlaceBSPDoors() {
 				if len(usedDirections) == 4 {
 					break
 				}
-				doorPoint, direction = d.randomDoorDirection(room)
-				breaking := false
-				for _, usedDirection := range usedDirections {
-					if direction == usedDirection {
-						breaking = true
-						break
-					}
-				}
-				if breaking {
-					break
-				}
 			}
+			doorID++
 		}
-		d.Rooms[i].Doors = sortDoors(d.Rooms[i].Doors)
+		room.Doors = sortDoors(room.Doors)
 	}
 }
 
@@ -399,7 +416,7 @@ func (d *BSPDungeon) CarveDijkstraCorridors() {
 			if d.ExpandedGrid[start.Y][start.X].Connected {
 				continue
 			}
-			_, endPoint, path := dijkstraFindNearest(*d, start, room.ID)
+			_, endPoint, path := dijkstraFindNearest(*d, start, room.ID, door.ID)
 			if endPoint.X == -1 || endPoint.Y == -1 {
 				continue
 			}
@@ -410,6 +427,9 @@ func (d *BSPDungeon) CarveDijkstraCorridors() {
 			}
 			d.Corridors[corridorID][room.ID] = true
 			d.Corridors[corridorID][d.ExpandedGrid[endPoint.Y][endPoint.X].ID] = true
+			for k, _ := range d.Corridors[corridorID] {
+				room.ConnectedRooms = append(room.ConnectedRooms, k)
+			}
 			d.ExpandedGrid[door.Y][door.X].CorridorID = corridorID
 			d.ExpandedGrid[door.Y][door.X].Connected = true
 			d.ExpandedGrid[start.Y][start.X].Connected = true
@@ -419,8 +439,8 @@ func (d *BSPDungeon) CarveDijkstraCorridors() {
 				// if d.ExpandedGrid[point.Y][point.X].Tile == Wall || d.ExpandedGrid[point.Y][point.X].Tile == Perimeter || d.ExpandedGrid[point.Y][point.X].Tile == Floor {
 				if d.ExpandedGrid[point.Y][point.X].Tile != Door {
 					d.ExpandedGrid[point.Y][point.X].Tile = Floor
-					d.ExpandedGrid[point.Y][point.X].PathingValue = room.ID + 1
-					// grid[point.Y][point.X] = d.ExpandedGrid[point.Y][point.X].PathingValue
+					d.ExpandedGrid[point.Y][point.X].PathValue = room.ID + 1
+					// grid[point.Y][point.X] = d.ExpandedGrid[point.Y][point.X].PathValue
 				}
 			}
 		}
@@ -430,6 +450,9 @@ func (d *BSPDungeon) CarveDijkstraCorridors() {
 func NewBSPDungeon(width, height, minSize, numberOfRooms int) *BSPDungeon {
 	d := NewDungeon(width, height, true, false)
 	// rand.Seed(422134)
+	seed := time.Now().UnixNano()
+	// seed = 1738669161687714725
+	rand.Seed(seed)
 	counter := new(int)
 	root := SplitSpace(0, 0, width, height, minSize, d, counter)
 	d.ShiftX = CalculateShiftX(root, 0)
@@ -444,12 +467,23 @@ func NewBSPDungeon(width, height, minSize, numberOfRooms int) *BSPDungeon {
 	count := new(int)
 	d.CarveBSP(root, count, numberOfRooms)
 	d.PlaceBSPDoors()
-	d.Print()
+	// d.Print()
 	if !d.UseSplitsAsCorridors {
 		d.CarveDijkstraCorridors()
 	}
 	d.RemoveBSPDeadEnds()
 	d.Print()
+	fmt.Println("Seed:", seed)
+	grid := d.getPathGrid()
+	islands := findIslands(grid)
+	fmt.Println(len(islands))
+	for len(islands) > 1 {
+		grid = connectIslands(grid, islands)
+		islands = findIslands(grid)
+	}
+	d.CorrectTheGrid(grid)
+	d.Print()
+	// printGrid(grid)
 	// printTreeSpatially(root, 0, 2)
 	// GetShiftY(root)
 	// fmt.Println("Width:", d.Width)
@@ -462,6 +496,45 @@ func NewBSPDungeon(width, height, minSize, numberOfRooms int) *BSPDungeon {
 	// 	println(d.MaxLeftHorizontalSplits(root, 0))
 	// }
 	return d
+}
+
+func (d *BSPDungeon) CorrectTheGrid(grid [][]int) {
+	for y := 0; y < d.ActualHeight; y++ {
+		for x := 0; x < d.ActualWidth; x++ {
+			if grid[y][x] == 2 && d.ExpandedGrid[y][x].Tile == Wall {
+				d.ExpandedGrid[y][x].Tile = Floor
+			}
+		}
+	}
+}
+
+func printGrid(grid [][]int) {
+	for _, row := range grid {
+		for _, cell := range row {
+			switch cell {
+			case 1:
+				fmt.Print(" .")
+			default:
+				fmt.Printf("%2d", cell)
+			}
+		}
+		fmt.Println()
+	}
+}
+
+func (d *BSPDungeon) getPathGrid() [][]int {
+	grid := make([][]int, d.ActualHeight)
+	for i := range grid {
+		grid[i] = make([]int, d.ActualWidth)
+		for j := range grid[i] {
+			if d.ExpandedGrid[i][j].PathValue > 1 {
+				grid[i][j] = 2
+			} else {
+				grid[i][j] = d.ExpandedGrid[i][j].PathValue
+			}
+		}
+	}
+	return grid
 }
 
 func (d *BSPDungeon) Print() {
@@ -484,17 +557,17 @@ func (d *BSPDungeon) Print() {
 	// 	println()
 	// }
 	// println()
-	for _, row := range d.ExpandedGrid {
-		for _, cell := range row {
-			if cell.PathingValue == blockedDijkstraWeight {
-				print("█ ")
-			} else {
-				print(fmt.Sprintf("%-2d", cell.PathingValue))
-			}
-		}
-		println()
-	}
-	println()
+	// for _, row := range d.ExpandedGrid {
+	// 	for _, cell := range row {
+	// 		if cell.PathValue == blockedDijkstraWeight {
+	// 			print("█ ")
+	// 		} else {
+	// 			print(fmt.Sprintf("%-2d", cell.PathValue))
+	// 		}
+	// 	}
+	// 	println()
+	// }
+	// println()
 	for _, row := range d.ExpandedGrid {
 		for _, cell := range row {
 			// if cell == Wall || cell == Perimeter {
@@ -614,4 +687,125 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// Finds all islands of `2`s and their bordering `1`s
+func findIslands(grid [][]int) [][][]int {
+	rows, cols := len(grid), len(grid[0])
+	visited := make([][]bool, rows)
+	for i := range visited {
+		visited[i] = make([]bool, cols)
+	}
+
+	var islands [][][]int // List of islands, each containing (x,y) positions
+
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			if !visited[r][c] && (grid[r][c] == 2 || grid[r][c] == -1) {
+				// New island found
+				queue := list.New()
+				queue.PushBack([]int{r, c})
+				island := [][]int{}
+
+				for queue.Len() > 0 {
+					cell := queue.Remove(queue.Front()).([]int)
+					x, y := cell[0], cell[1]
+
+					if visited[x][y] {
+						continue
+					}
+
+					visited[x][y] = true
+					island = append(island, []int{x, y})
+
+					// Explore neighbors
+					for _, d := range directions {
+						nx, ny := x+d.Y, y+d.X
+						if nx >= 0 && ny >= 0 && nx < rows && ny < cols &&
+							!visited[nx][ny] && (grid[nx][ny] == 2 || grid[nx][ny] == -1) {
+							queue.PushBack([]int{nx, ny})
+						}
+					}
+				}
+				islands = append(islands, island)
+			}
+		}
+	}
+	return islands
+}
+
+// Finds the shortest path between disconnected `2` islands using BFS
+func connectIslands(grid [][]int, islands [][][]int) [][]int {
+	if len(islands) <= 1 {
+		return grid // Already connected
+	}
+
+	rows, cols := len(grid), len(grid[0])
+	queue := list.New()
+	visited := make([][]bool, rows)
+	prev := make([][]*[]int, rows) // Store previous position for path reconstruction
+
+	for i := range visited {
+		visited[i] = make([]bool, cols)
+		prev[i] = make([]*[]int, cols)
+	}
+
+	// Start BFS from first island's `2`s
+	for _, cell := range islands[0] {
+		x, y := cell[0], cell[1]
+		if grid[x][y] == 2 { // Only start from `2`s
+			queue.PushBack([]int{x, y})
+			visited[x][y] = true
+		}
+	}
+
+	// Perform BFS to find the shortest path to another island
+	var targetCell []int
+	found := false
+	for queue.Len() > 0 && !found {
+		cell := queue.Remove(queue.Front()).([]int)
+		x, y := cell[0], cell[1]
+
+		for _, d := range directions {
+			nx, ny := x+d.Y, y+d.X
+
+			// Stay in bounds and avoid `-1`
+			if nx >= 0 && ny >= 0 && nx < rows && ny < cols && !visited[nx][ny] && grid[nx][ny] != -1 {
+				visited[nx][ny] = true
+				prev[nx][ny] = &[]int{x, y} // Store previous step
+				queue.PushBack([]int{nx, ny})
+
+				// If we reached another `2` from a different island, stop BFS
+				for _, island := range islands[1:] {
+					for _, icell := range island {
+						if icell[0] == nx && icell[1] == ny && grid[nx][ny] == 2 {
+							targetCell = []int{nx, ny}
+							found = true
+							break
+						}
+					}
+					if found {
+						break
+					}
+				}
+			}
+		}
+	}
+
+	// Reconstruct the shortest path and convert necessary `1`s to `2`s
+	for targetCell != nil {
+		x, y := targetCell[0], targetCell[1]
+		if grid[x][y] == 1 {
+			grid[x][y] = 2 // Change `1` to `2` to create the connection
+		}
+
+		// Fix: Dereference prev[x][y] safely
+		if prev[x][y] != nil {
+			targetCell = *prev[x][y]
+		} else {
+			targetCell = nil // End path reconstruction
+		}
+	}
+
+	return grid
 }
