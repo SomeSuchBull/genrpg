@@ -15,7 +15,6 @@ var mapCmd = &cobra.Command{
 	Long:  `Generate a dungeon map`,
 	Run: func(cmd *cobra.Command, args []string) {
 		dungeon.Generate()
-
 	},
 }
 

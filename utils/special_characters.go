@@ -1,13 +1,11 @@
 package utils
 
 const (
-	spec1  = "▒"
-	spec2  = "░"
-	spec3  = "█"
-	spec4  = "▓"
+	spec1  = "░"
+	spec2  = "▒"
+	spec3  = "▓"
+	spec4  = "█"
 	spec5  = "▄"
-	spec6  = "▀"
-	spec7  = "▌"
 	spec8  = "▐"
 	spec9  = "▬"
 	spec10 = "▰"
@@ -73,4 +71,15 @@ const (
 	spec70 = "◼"
 	spec71 = "◽"
 	spec72 = "◾"
+)
+
+const (
+	fill   = "█"
+	fill78 = "▉"
+	fill34 = "▊"
+	fill58 = "▋"
+	fill12 = "▌"
+	fill38 = "▍"
+	fill14 = "▎"
+	fill18 = "▏"
 )
