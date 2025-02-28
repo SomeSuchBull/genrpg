@@ -8,8 +8,8 @@ import (
 
 type Node struct {
 	point             Point
-	distance          int
 	previousDirection Point
+	distance          int
 }
 
 const (
@@ -91,7 +91,7 @@ func dijkstraFindNearest(d BSPDungeon, start Point, originID, doorID int) (int, 
 
 	pq := &PriorityQueue{}
 	heap.Init(pq)
-	heap.Push(pq, Node{start, 0, Point{-1, -1}})
+	heap.Push(pq, Node{start, Point{-1, -1}, 0})
 
 	starting := true
 	for pq.Len() > 0 {
@@ -132,7 +132,7 @@ func dijkstraFindNearest(d BSPDungeon, start Point, originID, doorID int) (int, 
 				if newDist < distance[ny][nx] {
 					distance[ny][nx] = newDist
 					previous[ny][nx] = currentPoint
-					heap.Push(pq, Node{Point{nx, ny}, newDist, dir})
+					heap.Push(pq, Node{Point{nx, ny}, dir, newDist})
 				}
 			}
 		}

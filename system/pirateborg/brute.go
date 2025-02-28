@@ -8,16 +8,16 @@ import (
 )
 
 type Brute struct {
-	Lvl             int       `json:"level"`
-	HitDie          int       `json:"hitDie"`
 	StatMods        Stats     `json:"statMods"`
-	DevilsLuck      string    `json:"devilsLuck"`
-	ClothingDie     int       `json:"clothingDie"`
-	HatDie          int       `json:"hatDie"`
-	StartingFeature Feature   `json:"startingFeature"`
 	Features        []Feature `json:"features"`
 	Items           []Item    `json:"item"`
 	Weapons         []Weapon  `json:"weapons"`
+	StartingFeature Feature   `json:"startingFeature"`
+	DevilsLuck      string    `json:"devilsLuck"`
+	Lvl             int       `json:"level"`
+	HitDie          int       `json:"hitDie"`
+	ClothingDie     int       `json:"clothingDie"`
+	HatDie          int       `json:"hatDie"`
 }
 
 func NewBrute() PlayerClass {

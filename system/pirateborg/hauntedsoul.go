@@ -7,10 +7,10 @@ import (
 )
 
 type HauntedSoul struct {
-	Name            string    `json:"name"`
-	Descrptn        string    `json:"description"`
 	Features        []Feature `json:"features"`
 	AdditionalClass PlayerClass
+	Name            string `json:"name"`
+	Descrptn        string `json:"description"`
 }
 
 func NewHauntedSoul() PlayerClass {

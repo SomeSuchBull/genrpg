@@ -11,9 +11,9 @@ import (
 type Pirate struct {
 	Name        string
 	Description string
+	Armor       string
 	Morale      int
 	HP          int
-	Armor       string
 }
 
 func GeneratePirate() Pirate {
@@ -180,12 +180,12 @@ func (vc VesselCargo) String() string {
 }
 
 type Vessel struct {
+	Cargo             VesselCargo `json:"cargo"`
 	Class             string      `json:"class"`
 	Armament          string      `json:"armament"`
 	CrewQuantity      string      `json:"crewQuantity"`
 	CrewQuality       string      `json:"crewQuality"`
 	ShipName          string      `json:"shipName"`
-	Cargo             VesselCargo `json:"cargo"`
 	OptionalPlotTwist string      `json:"optionalPlotTwist"`
 }
 

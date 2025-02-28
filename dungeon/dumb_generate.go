@@ -43,15 +43,15 @@ var mapStyles = map[string]struct {
 }
 
 type DumbCell struct {
+	Label                                                          string
+	ID                                                             int
 	Blocked, Room, Corridor, Perimeter, Entrance                   bool
 	Arch, Door, Locked, Trapped, Secret, Portc, StairDown, StairUp bool
-	ID                                                             int
-	Label                                                          string
 }
 
 type RoomData struct {
-	ID, Row, Col, N, S, W, E, Height, Width, Area int
 	Doors                                         map[string][]map[string]any
+	ID, Row, Col, N, S, W, E, Height, Width, Area int
 }
 
 func NewCell() *DumbCell {
@@ -162,9 +162,9 @@ var closeEnd = map[string]map[string]any{
 }
 
 type SeedOptions struct {
+	DungeonLayout, RoomLayout, CorridorLayout                 string
 	Seed                                                      int64
 	NRows, NCols, RoomMin, RoomMax, AddStairs, RemoveDeadEnds int
-	DungeonLayout, RoomLayout, CorridorLayout                 string
 }
 
 func getOptions() *SeedOptions {
@@ -184,11 +184,11 @@ func getOptions() *SeedOptions {
 }
 
 type DumbDungeon struct {
-	Seed                                                                          SeedOptions
-	Ni, Nj, MaxRow, MaxCol, NRooms, RoomBase, RoomRadix, LastRoomID, NRows, NCols int
-	Cells                                                                         [][]*DumbCell
 	Rooms                                                                         map[int]*RoomData
+	Seed                                                                          SeedOptions
+	Cells                                                                         [][]*DumbCell
 	Stairs, Doors                                                                 []map[string]any
+	Ni, Nj, MaxRow, MaxCol, NRooms, RoomBase, RoomRadix, LastRoomID, NRows, NCols int
 }
 
 // TODO: Implement mask - dungeon shape

@@ -7,16 +7,16 @@ import (
 )
 
 type TallTale struct {
-	Name            string    `json:"name"`
-	Descrptn        string    `json:"description"`
-	Features        []Feature `json:"features"`
-	Die             int
 	StatMods        Stats
+	Features        []Feature `json:"features"`
+	AdditionalClass PlayerClass
+	Descrptn        string `json:"description"`
+	Name            string `json:"name"`
+	DevilsLuck      string
+	Die             int
 	HitDie          int
 	Lvl             int
 	WeaponDie       int
-	DevilsLuck      string
-	AdditionalClass PlayerClass
 }
 
 func NewTallTale() PlayerClass {

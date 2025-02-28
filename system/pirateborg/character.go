@@ -30,22 +30,22 @@ func (s Stats) String() string {
 // }
 
 type PlayerCharacter struct {
-	Name              string      `json:"name"`
-	Stats             Stats       `json:"stats"`
-	Class             PlayerClass `json:"class"`
-	Features          []Feature   `json:"features"`
-	HP                int         `json:"hp"`
-	CarryingCapacity  int         `json:"carryingCapacity"`
-	Nickname          string      `json:"nickname"`
-	Weapons           Weapons     `json:"weapons"`
+	Character         Character   `json:"character"`
 	Clothing          Clothing    `json:"clothing"`
-	Armor             string      `json:"armor"`
 	Hat               Hat         `json:"hat"`
+	Stats             Stats       `json:"stats"`
+	Features          []Feature   `json:"features"`
+	Weapons           Weapons     `json:"weapons"`
 	Gear              Gear        `json:"gear"`
+	Class             PlayerClass `json:"class"`
+	Name              string      `json:"name"`
+	Nickname          string      `json:"nickname"`
+	Armor             string      `json:"armor"`
 	Container         string      `json:"container"`
 	Money             string      `json:"money"`
-	Character         Character   `json:"character"`
 	ThingOfImportance string      `json:"thingOfImportance"`
+	HP                int         `json:"hp"`
+	CarryingCapacity  int         `json:"carryingCapacity"`
 }
 
 type Weapons []Weapon
@@ -476,9 +476,9 @@ func (pc *PlayerCharacter) CreateThingOfImportance() {
 }
 
 type CharacterBackground struct {
+	Item             Item
 	Name             string
 	Money            string
-	Item             Item
 	RestOfBackground string
 }
 

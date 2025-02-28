@@ -68,10 +68,10 @@ func PrintJSON(j any) error {
 }
 
 type Distribution struct {
-	RangeMin, RangeMax, ValueMin, ValueMax int
-	Extreme                                float64
 	ResultContinuos                        map[int]float64
 	ResultDiscrete                         map[int]int
+	Extreme                                float64
+	RangeMin, RangeMax, ValueMin, ValueMax int
 }
 
 func (d *Distribution) Generate() error {

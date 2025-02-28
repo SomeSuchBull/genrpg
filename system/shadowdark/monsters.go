@@ -249,15 +249,15 @@ type IsMonster interface {
 }
 
 type Monster struct {
-	Name             string           `json:"name"`
-	Level            int              `json:"level"`
+	Tags             []MonsterTag     `json:"tags"`
+	Biomes           []Biome          `json:"biomes"`
 	MonsterAlignment MonsterAlignment `json:"alignment"`
+	Name             string           `json:"name"`
 	Move             string           `json:"move"`
 	Attack           string           `json:"attack"`
 	Page             string           `json:"page"`
 	StatBlock        string           `json:"stat_block"`
-	Tags             []MonsterTag     `json:"tags"`
-	Biomes           []Biome          `json:"biomes"`
+	Level            int              `json:"level"`
 }
 
 func (m Monster) String() string {
@@ -299,12 +299,12 @@ func ShowDistribution() {
 }
 
 type RandomMonster struct {
-	AC, Level, Combat, AttackNumber int
-	DamageDie                       string
 	Quality                         MonsterQuality
 	Strength                        MonsterStrength
 	Weakness                        MonsterWeakness
 	Mutation1, Mutation2, Mutation3 MonsterMutation
+	DamageDie                       string
+	AC, Level, Combat, AttackNumber int
 }
 
 func (m RandomMonster) String() string {

@@ -18,9 +18,9 @@ type MagicItem interface {
 
 type NamedMagicItem struct {
 	Personality MagicItemPersonality
-	Name        string
 	Benefit     *string
 	Curse       *string
+	Name        string
 }
 
 func (n *NamedMagicItem) String() string {
@@ -125,13 +125,13 @@ var magicItemTraits = []string{"Imperious", "Polite", "Puritanical", "Charming",
 // Armor
 type MagicItemArmor struct {
 	Personality MagicItemPersonality
-	Name        string
-	Type        string
-	Mithral     bool
 	Bonus       *int
-	Feature     string
 	Benefit     *string
 	Curse       *string
+	Name        string
+	Type        string
+	Feature     string
+	Mithral     bool
 }
 
 var magicArmorFeatures = []string{"Demonic horned face", "Oak leaf motif", "Studded with shark teeth", "Dragon scales", "Bone or metal spikes", "Faint arcane runes", "Turtle shell plating", "Made of scorpion chitin", "Gilded metal/gold thread", "Scorched, smells burned", "Pearl-white fish scales", "Oozes blood", "Festooned with fungi", "Distant sound of ocean", "Set with crystals", "Draped in holy symbols", "Exudes tree sap", "Blurry, indistinct edges", "Large golden cat eye", "Covered in frost"}
@@ -243,9 +243,9 @@ func (a *MagicItemArmor) SetPersonality(p MagicItemPersonality) {
 
 type MagicItemPotion struct {
 	MagicItemPersonality
-	Name     string
 	Features []string
 	Mixing   []string
+	Name     string
 	Benefit  string
 	Curse    string
 }
@@ -282,10 +282,10 @@ func getPotionCurse() string {
 
 type MagicItemScrollWand struct {
 	Personality MagicItemPersonality
-	Name        string
-	Feature     string
 	Benefit     *string
 	Curse       *string
+	Name        string
+	Feature     string
 	Spell       string
 	SpellTier   int
 }
@@ -421,12 +421,12 @@ func getUtilityBenefit() string {
 
 type MagicItemWeapon struct {
 	Personality MagicItemPersonality
-	Name        string
-	Type        string
-	Bonus       *int
-	Feature     string
 	Benefits    *[]string
 	Curse       *string
+	Bonus       *int
+	Name        string
+	Type        string
+	Feature     string
 }
 
 var magicWeaponFeatures = []string{"Trails sparkles", "Starmetal", "Rusted and chipped", "Gem in pommel/handle", "Drips green ichor", "Moon motif and silvered", "Galaxies swirl on surface", "Ironwood", "Rune-scribed", "Faint, ghostly aura", "Inlaid with gold", "Trails incense", "Studded with gemstones", "Sparks dance on surface", "Shaped like an animal", "Carved from granite", "Dragonbone hardware", "Whispers in a language", "Drips ocean water", "Turns blood to rose petals"}

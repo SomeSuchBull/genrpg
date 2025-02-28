@@ -20,11 +20,11 @@ const (
 
 type Cell struct {
 	Tile          Tile
+	DoorPerimeter DoorPerimeter
 	PathValue     int
 	ID            int
 	CorridorID    int
 	Connected     bool
-	DoorPerimeter DoorPerimeter
 }
 
 type DoorPerimeter struct {
@@ -37,9 +37,9 @@ type Point struct {
 }
 
 type BSPDoor struct {
-	Point
 	Direction Point
-	ID        int
+	Point
+	ID int
 }
 
 var deadEnds = map[Point][]Point{
@@ -54,17 +54,17 @@ func (p Point) String() string {
 }
 
 type BSPRoom struct {
-	ID                            int
-	Point                         // Top-left corner
-	Width, Height, ShiftX, ShiftY int
-	ExpandedX, ExpandedY          int
 	Doors                         []BSPDoor
 	ConnectedRooms                []int
+	Point                         // Top-left corner
+	ID                            int
+	Width, Height, ShiftX, ShiftY int
+	ExpandedX, ExpandedY          int
 }
 
 type Split struct {
-	Type         Tile
 	Points       [2]Point
+	Type         Tile
 	SplitsBefore int
 	SplitsAfter  int
 }
@@ -79,13 +79,13 @@ func (s Split) String() string {
 
 type BSPDungeon struct {
 	Corridors                 map[int]map[int]bool
+	Rooms                     map[int]*BSPRoom
+	InitialGrid               [][]Tile
+	ExpandedGrid              [][]Cell
+	Splits                    []BSPNode
 	Width, Height             int
 	ActualWidth, ActualHeight int
 	ShiftX, ShiftY            int
-	InitialGrid               [][]Tile
-	ExpandedGrid              [][]Cell
-	Rooms                     map[int]*BSPRoom
-	Splits                    []BSPNode
 	Expanded                  bool
 	UseSplitsAsCorridors      bool
 }
@@ -168,10 +168,10 @@ func (d *BSPDungeon) CarveSplitCorridor(node *BSPNode) {
 }
 
 type BSPNode struct {
-	X, Y, Width, Height  int
-	Left, Right          *BSPNode
-	ID                   int
 	Split                Split
+	Left, Right          *BSPNode
+	X, Y, Width, Height  int
+	ID                   int
 	ShiftX, ShiftY       int
 	EndShiftX, EndShiftY int
 }

@@ -83,8 +83,8 @@ var mapsBossMonster = []string{"Physically strongest", "Religious leader", "Guar
 // NPCs
 type NPC struct {
 	Ancestry   Ancestry
-	Age        string
 	Alignment  Alignment
+	Age        string
 	Wealth     string
 	Appearance string
 	Does       string
@@ -146,15 +146,15 @@ func (c Character) String() string {
 
 // Rival crawlers
 type RivalParty struct {
-	Level            int
-	Alignment        Alignment
 	Characters       []Character
+	Alignment        Alignment
 	Renown           string
 	Secret           string
 	Wealth           string
 	Name             string
 	KnownFor         string
 	SignatureTactics string
+	Level            int
 }
 
 func (r RivalParty) String() string {
