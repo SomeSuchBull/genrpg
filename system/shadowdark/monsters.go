@@ -625,7 +625,7 @@ func LoadMonsters(w io.Writer) error {
 				}
 			}
 			inputString += "}"
-			fmt.Fprintln(w, inputString)
+			_, _ = fmt.Fprintln(w, inputString)
 		}
 	}
 	return nil

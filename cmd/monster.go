@@ -17,9 +17,13 @@ var monsterCmd = &cobra.Command{
 	Short: "Get a monster",
 	Long:  `Get or generate a monster.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var err error
+		if len(args) == 0 {
+			err = fmt.Errorf("Input a number")
+			panic(err)
+		}
 		level, err := strconv.ParseInt(args[0], 10, 64)
 		if err != nil {
-			fmt.Errorf("Error: %v\nInput a number", err)
 			panic(err)
 		}
 		output := shadowdark.MonsterGenerator(int(level))

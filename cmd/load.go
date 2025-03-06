@@ -20,8 +20,11 @@ var loadCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		defer outputFile.Close()
-		shadowdark.LoadMonsters(outputFile)
+		defer func() { _ = outputFile.Close() }()
+		err = shadowdark.LoadMonsters(outputFile)
+		if err != nil {
+			panic(err)
+		}
 	},
 }
 

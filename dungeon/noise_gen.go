@@ -46,7 +46,11 @@ func (d *NoiseDungeon) Print() {
 
 func CreateNoiseDungeon(width, height int) *NoiseDungeon {
 	d := NewNoiseDungeon(width, height)
-	d.Generate()
+	err := d.Generate()
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
 	d.Print()
 	return d
 }
