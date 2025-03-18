@@ -20,6 +20,7 @@ var stockCmd = &cobra.Command{
 	Short: "Stock a dungeon.",
 	Long:  `Stock a dungeon with monsters, traps, treasure, and other.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		resolveSystem()
 		switch {
 		case rooms == 0:
 			fmt.Println("Nothing to stock.")
@@ -28,11 +29,12 @@ var stockCmd = &cobra.Command{
 			rooms = 999
 			fallthrough
 		default:
-			switch {
-			case system == "sd" || system == "shadowdark":
+			switch system {
+			case shadowDarkName:
 				shadowdark.Stocking(rooms, int(level))
 			default:
 				system = "knave"
+				resolveSystem()
 				knave.Stocking(rooms, level, verbose)
 			}
 		}

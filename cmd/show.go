@@ -14,7 +14,11 @@ var showCmd = &cobra.Command{
 	Short: "Show something.",
 	Long:  `Show a whole list of things.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		shadowdark.ShowDistribution()
+		resolveSystem()
+		switch system {
+		default:
+			shadowdark.ShowDistribution()
+		}
 	},
 }
 

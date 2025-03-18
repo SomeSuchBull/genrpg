@@ -30,6 +30,10 @@ var systemMap = map[string]string{
 	"pb":          pirateBorgName,
 }
 
+func resolveSystem() {
+	system = systemMap[system]
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "genrpg",

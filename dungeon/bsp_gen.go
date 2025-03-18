@@ -682,13 +682,6 @@ func (d *BSPDungeon) checkDeadEnd(point Point, deadEnd []Point) bool {
 	return true
 }
 
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 // Finds all islands of `2`s and their bordering `1`s
 func findIslands(grid [][]int) [][][]int {
 	rows, cols := len(grid), len(grid[0])

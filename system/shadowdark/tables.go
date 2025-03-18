@@ -15,16 +15,82 @@ const (
 	Chaotic Alignment = "Chaotic"
 )
 
-type Ancestry string
+type Ancestry struct {
+	Name        string
+	FeatureText string
+	FeatureFunc func(*PlayerCharacter)
+}
 
-const (
-	DwarfAncestry    Ancestry = "Dwarf"
-	ElfAncestry      Ancestry = "Elf"
-	HalflingAncestry Ancestry = "Halfling"
-	HumanAncestry    Ancestry = "Human"
-	HalfOrcAncestry  Ancestry = "Half-Orc"
-	GoblinAncestry   Ancestry = "Goblin"
-)
+func (a Ancestry) String() string {
+	return a.Name
+}
+
+var DwarfAncestry = Ancestry{
+	Name: "Dwarf",
+	FeatureText: fmt.Sprintf(
+		"%s Start with +2 HP. Roll hit points per level with advantage. %s",
+		utils.B("Stout."), utils.I("Already added.")),
+	FeatureFunc: func(pc *PlayerCharacter) {
+		die := pc.Class.HPDie()
+		pc.HP = max(2+pc.Stats.Constitution.Mod()+max(utils.D(die), utils.D(die)), 1)
+	},
+}
+
+var ElfAncestry = Ancestry{
+	Name: "Elf",
+	FeatureText: fmt.Sprintf(
+		"%s You get a +1 bonus to attack rolls with ranged weapons or a +1 bonus to spellcasting checks. %s",
+		utils.B("Farsight."), utils.I("Already added.")),
+	FeatureFunc: func(pc *PlayerCharacter) {
+		if pc.Optimized {
+			if pc.Class.Spellcaster() {
+				pc.Attacks.Cast++
+			} else {
+				pc.Attacks.Ranged++
+			}
+		} else {
+			switch utils.D(2) {
+			case 1:
+				pc.Attacks.Ranged++
+			case 2:
+				pc.Attacks.Cast++
+			}
+		}
+	},
+}
+
+var HalflingAncestry = Ancestry{
+	Name:        "Halfling",
+	FeatureText: fmt.Sprintf("%s Once per day, you can become invisible for 3 rounds.", utils.B("Stealthy.")),
+	FeatureFunc: func(pc *PlayerCharacter) {},
+}
+
+var HumanAncestry = Ancestry{
+	Name: "Human",
+	FeatureText: fmt.Sprintf(
+		"%s You gain one additional talent roll at 1st level. %s",
+		utils.B("Ambitious."), utils.I("Already added.")),
+	FeatureFunc: func(pc *PlayerCharacter) {
+		pc.Class.RollTalent()
+	},
+}
+
+var HalfOrcAncestry = Ancestry{
+	Name: "Half-Orc",
+	FeatureText: fmt.Sprintf(
+		"%s You have a +1 bonus to attack and damage rolls with melee weapons. %s",
+		utils.B("Mighty."), utils.I("Already added.")),
+	FeatureFunc: func(pc *PlayerCharacter) {
+		pc.Attacks.Melee++
+		pc.Attacks.MeleeDamage++
+	},
+}
+
+var GoblinAncestry = Ancestry{
+	Name:        "Goblin",
+	FeatureText: fmt.Sprintf("%s You can't be surprised.", utils.B("Keen Senses.")),
+	FeatureFunc: func(pc *PlayerCharacter) {},
+}
 
 var traps = [3][]string{
 	// Trap
@@ -111,7 +177,7 @@ func NewNPC() NPC {
 		Secret:     npcSecret[rand.Intn(len(npcSecret))],
 		Occupation: npcOccupation[rand.Intn(len(npcOccupation))],
 	}
-	n.Name = npcNames[n.Ancestry][rand.Intn(len(npcNames[n.Ancestry]))]
+	n.Name = npcNames[n.Ancestry.Name][rand.Intn(len(npcNames[n.Ancestry.Name]))]
 	n.Identifier = npcIdentifier[rand.Intn(len(npcIdentifier))]
 	return n
 }
@@ -124,13 +190,13 @@ var npcAppearance = []string{"Balding", "Stocky build", "Very tall", "Beauty mar
 var npcDoes = []string{"Spits", "Always eating", "Moves quickly", "Card tricks", "Prays aloud", "Writes in diary", "Apologetic", "Slaps backs", "Drops things", "Swears oaths", "Makes puns", "Rare accent", "Easily spooked", "Forgetful", "Speaks quietly", "Twitches", "Moves slowly", "Speaks loudly", "Swaggers", "Smokes pipe"}
 var npcSecret = []string{"Hiding a fugitive", "Adores baby animals", "Obsessed with fire", "In a religious cult", "Is a half-demon", "Was a wizard's apprentice", "Needlessly picks pockets", "Has a false identity", "Afraid of storms", "Has functional gills", "In deep gambling debt", "Works as a smuggler", "Is a werewolf", "Can actually smell lies", "Cast out of wealthy family", "In love with a bartender", "Left the Thieves' Guild", "Best friends with a prince", "Retired crawler", "Has a pet basilisk"}
 var npcOccupation = []string{"Gravedigger", "Carpenter", "Scholar", "Blacksmith", "Tax collector", "Farmer", "Bartender", "Beggar", "Baker", "Cook", "Sailor", "Butcher", "Locksmith", "Cobbler", "Friar/nun", "Merchant"} // d16
-var npcNames = map[Ancestry][]string{
-	DwarfAncestry:    {"Hera", "Torin", "Ginny", "Gant", "Olga", "Dendor", "Ygrid", "Pike", "Sarda", "Brigg", "Zorli", "Yorin", "Jorgena", "Trogin", "Riga", "Barton", "Katrina", "Egrim", "Elsa", "Orgo"},
-	ElfAncestry:      {"Sarenia", "Ravos", "Imeria", "Farond", "Isolden", "Kieren", "Mirenel", "Riarden", "Allindra", "Arlomas", "Sylara", "Tyr", "Rinariel", "Saramir", "Vedana", "Elindos", "Ophelia", "Cydaros", "Tiramel", "Varond"},
-	GoblinAncestry:   {"Kog", "Dibbs", "Fronk", "Irv", "Squag", "Mort", "Vig", "Sticks", "Gorb", "Yogg", "Plok", "Zrak", "Dent", "Krik", "Mizzo", "Bort", "Nabo", "Hink", "Bree", "Kreeb"},
-	HalflingAncestry: {"Myrtle", "Robby", "Nora", "Percy", "Daisy", "Jolly", "Evelyn", "Horace", "Willie", "Gertie", "Peri", "Carlsby", "Nyx", "Kellan", "Fern", "Harlow", "Moira", "Sage", "Reenie", "Wendry"},
-	HalfOrcAncestry:  {"Troga", "Boraal", "Urgana", "Zoraal", "Scalga", "Krell", "Voraga", "Morak", "Draga", "Sorak", "Varga", "Ulgar", "Jala", "Kresh", "Zana", "Torvash", "Rokara", "Gartak", "Iskana", "Ziraak"},
-	HumanAncestry:    {"Hesta", "Matteo", "Rosalin", "Endric", "Kiara", "Yao", "Corina", "Rowan", "Hariko", "Ikam", "Mariel", "Jin", "Hana", "Lios", "Indra", "Remy", "Nura", "Vakesh", "Una", "Nabilo"},
+var npcNames = map[string][]string{
+	DwarfAncestry.Name:    {"Hera", "Torin", "Ginny", "Gant", "Olga", "Dendor", "Ygrid", "Pike", "Sarda", "Brigg", "Zorli", "Yorin", "Jorgena", "Trogin", "Riga", "Barton", "Katrina", "Egrim", "Elsa", "Orgo"},
+	ElfAncestry.Name:      {"Sarenia", "Ravos", "Imeria", "Farond", "Isolden", "Kieren", "Mirenel", "Riarden", "Allindra", "Arlomas", "Sylara", "Tyr", "Rinariel", "Saramir", "Vedana", "Elindos", "Ophelia", "Cydaros", "Tiramel", "Varond"},
+	GoblinAncestry.Name:   {"Kog", "Dibbs", "Fronk", "Irv", "Squag", "Mort", "Vig", "Sticks", "Gorb", "Yogg", "Plok", "Zrak", "Dent", "Krik", "Mizzo", "Bort", "Nabo", "Hink", "Bree", "Kreeb"},
+	HalflingAncestry.Name: {"Myrtle", "Robby", "Nora", "Percy", "Daisy", "Jolly", "Evelyn", "Horace", "Willie", "Gertie", "Peri", "Carlsby", "Nyx", "Kellan", "Fern", "Harlow", "Moira", "Sage", "Reenie", "Wendry"},
+	HalfOrcAncestry.Name:  {"Troga", "Boraal", "Urgana", "Zoraal", "Scalga", "Krell", "Voraga", "Morak", "Draga", "Sorak", "Varga", "Ulgar", "Jala", "Kresh", "Zana", "Torvash", "Rokara", "Gartak", "Iskana", "Ziraak"},
+	HumanAncestry.Name:    {"Hesta", "Matteo", "Rosalin", "Endric", "Kiara", "Yao", "Corina", "Rowan", "Hariko", "Ikam", "Mariel", "Jin", "Hana", "Lios", "Indra", "Remy", "Nura", "Vakesh", "Una", "Nabilo"},
 }
 var npcIdentifier = []string{"The Gray", "One-Eye", "The Lesser", "The Cunning", "Silvertongue", "The Outcast", "Fasthands", "The Bold", "The Elder", "The Charmer", "The Exiled", "The Wise", "Tree-Speaker", "The Craven", "The Red", "Six-Finger"}
 
@@ -184,7 +250,7 @@ func NewRivalParty(level int) RivalParty {
 	}
 	for i := 0; i < utils.D(4)+1; i++ {
 		char := Character{Ancestry: rivalAncestry[rand.Intn(len(rivalAncestry))], Class: rivalClass[rand.Intn(len(rivalClass))]}
-		char.Name = npcNames[char.Ancestry][utils.TableDie(20)]
+		char.Name = npcNames[char.Ancestry.Name][utils.TableDie(20)]
 		r.Characters = append(r.Characters, char)
 	}
 	return r
@@ -211,3 +277,26 @@ var treasureTable03 = []string{"Bent tin fork (1 cp)", "Muddy torch (2 cp)", "Mu
 var treasureTable46 = []string{"Scattering of 3 cp", "Wooden ring carved with knot pattern (5 cp)", "Wooden ring carved with knot pattern (5 cp)", "Heavy iron key (1 sp)", "Heavy iron key (1 sp)", "Steel-banded wooden shield (10 gp)", "Steel-banded wooden shield (10 gp)", "Golden anchor necklace (10 gp)", "Golden anchor necklace (10 gp)", "Bag of 20 glass marbles (5 sp each)", "Bag of 20 glass marbles (5 sp each)", "Serrated greatsword (12 gp)", "Serrated greatsword (12 gp)", "Three silver-tipped javelins (4 gp each)", "Three silver-tipped javelins (4 gp each)", "Bag of rare spices (15 gp)", "Bag of rare spices (15 gp)", "Mahogany pipe with ivory inlay (25 gp)", "Mahogany pipe with ivory inlay (25 gp)", "Set of polished bone dice (25 gp)", "Set of polished bone dice (25 gp)", "Copper flask etched with an owl (30 gp)", "Copper flask etched with an owl (30 gp)", "Eyepatch made of batwing leather (30 gp)", "Eyepatch made of batwing leather (30 gp)", "Leather bandoleer with 10 blue bottles (3 gp each)", "Leather bandoleer with 10 blue bottles (3 gp each)", "Small oil painting of an elf woman (35 gp)", "Small oil painting of an elf woman (35 gp)", "Opalescent pearl (40 gp)", "Opalescent pearl (40 gp)", "Ceremonial, gold-capped warhammer (40 gp)", "Ceremonial, gold-capped warhammer (40 gp)", "Silver ring with a miniature emerald (40 gp)", "Silver ring with a miniature emerald (40 gp)", "Tapestry of a unicorn in a forest glade (45 gp)", "Tapestry of a unicorn in a forest glade (45 gp)", "Goblin-made clockwork dragon doll (45 gp)", "Goblin-made clockwork dragon doll (45 gp)", "Half-complete suit of chainmail (50 gp)", "Half-complete suit of chainmail (50 gp)", "Mace inlaid with gold holy symbols (50 gp)", "Mace inlaid with gold holy symbols (50 gp)", "Delicate, ancient vase of Myrkhosian make (50 gp)", "Delicate, ancient vase of Myrkhosian make (50 gp)", "Rare incense that is repulsive to undead (50 gp)", "Rare incense that is repulsive to undead (50 gp)", "Minotaur hoof with a gold horseshoe (50 gp)", "Minotaur hoof with a gold horseshoe (50 gp)", "Longsword with a fiery pearl set in the pommel (50 gp)", "Longsword with a fiery pearl set in the pommel (50 gp)", "Longsword with a fiery pearl set in the pommel (50 gp)", "Longsword with a fiery pearl set in the pommel (50 gp)", "Green crystal statuette of Memnon (50 gp)", "Green crystal statuette of Memnon (50 gp)", "Crimson holy symbol of Ramlaat with small ruby (55 gp)", "Crimson holy symbol of Ramlaat with small ruby (55 gp)", "Six black candles traced with gold runes (10 gp each)", "Six black candles traced with gold runes (10 gp each)", "Suit of dwarf-made chainmail (60 gp)", "Suit of dwarf-made chainmail (60 gp)", "Dragonbone crossbow carved as roaring dragon (60 gp)", "Dragonbone crossbow carved as roaring dragon (60 gp)", "Half-complete suit of plate mail (65 gp)", "Half-complete suit of plate mail (65 gp)", "Magnetic, iridescent chunk of meteorite (70 gp)", "Magnetic, iridescent chunk of meteorite (70 gp)", "Full-length mirror set in gold frame (70 gp)", "Full-length mirror set in gold frame (70 gp)", "Large, green scarab encased in amber (75 gp)", "Large, green scarab encased in amber (75 gp)", "Lute carved from ironwood with gold hardware (75 gp)", "Lute carved from ironwood with gold hardware (75 gp)", "Ivory tusk carved with angels battling demons (80 gp)", "Ivory tusk carved with angels battling demons (80 gp)", "Mithral shield inlaid with small, blue pearls (80 gp)", "Mithral shield inlaid with small, blue pearls (80 gp)", "Two intact griffon eggs (40 gp each)", "Two intact griffon eggs (40 gp each)", "Suit of blackened-steel plate mail (130 gp)", "Suit of blackened-steel plate mail (130 gp)", "2nd-tier spell scroll (140 gp)", "2nd-tier spell scroll (140 gp)", fmt.Sprintf("%s (150 gp)", utils.I("Potion of Healing")), fmt.Sprintf("%s (150 gp)", utils.I("Potion of Healing")), "3rd-tier spell scroll (200 gp)", "3rd-tier spell scroll (200 gp)", fmt.Sprintf("%s (200 gp)", utils.I("Potion of Flying")), fmt.Sprintf("%s (200 gp)", utils.I("Potion of Flying")), fmt.Sprintf("%s (200 gp)", utils.I("Potion of Giant Strength")), fmt.Sprintf("%s (200 gp)", utils.I("Potion of Giant Strength")), "Magic wand, 3rd-tier spell (curse) (250 gp)", "Magic wand, 3rd-tier spell (curse) (250 gp)", fmt.Sprintf("%s (250 gp)", utils.I("Ring of Feather Falling")), fmt.Sprintf("%s (250 gp)", utils.I("Ring of Feather Falling")), "+2 magic armor (benefit, curse) (300 gp)", "+2 magic armor (benefit, curse) (300 gp)", fmt.Sprintf("%s (300 gp)", utils.I("Kytherian Cog")), fmt.Sprintf("%s (300 gp)", utils.I("Kytherian Cog")), "+2 magic weapon (benefit, curse) (500 gp)"}
 var treasureTable79 = []string{"Broken glass shards (2 cp)", "Pair of muddy boots (5 sp)", "Pair of muddy boots (5 sp)", "Rotting, leather pouch with 12 sp", "Rotting, leather pouch with 12 sp", "Greatsword made of blue steel (15 gp)", "Greatsword made of blue steel (15 gp)", "Tall, thin mirror in a bronze frame (20 gp)", "Tall, thin mirror in a bronze frame (20 gp)", "Pair of bastard swords with griffon pommels (20 gp)", "Pair of bastard swords with griffon pommels (20 gp)", "Silver-and-gold statuette of an elf archer (25 gp)", "Silver-and-gold statuette of an elf archer (25 gp)", "Taxidermied smilodon (30 gp)", "Taxidermied smilodon (30 gp)", "Cameo necklace of a human's profile (30 gp)", "Cameo necklace of a human's profile (30 gp)", "Ivory horn mug carved with drinking dwarves (35 gp)", "Ivory horn mug carved with drinking dwarves (35 gp)", "Ironwood longbow engraved with silver leaves (35 gp)", "Ironwood longbow engraved with silver leaves (35 gp)", "Mahogany chess board with silver pieces (40 gp)", "Mahogany chess board with silver pieces (40 gp)", "Mithral shield polished to a mirror-shine (45 gp)", "Mithral shield polished to a mirror-shine (45 gp)", "Iridescent, spiralled unicorn horn (50 gp)", "Iridescent, spiralled unicorn horn (50 gp)", "Basilisk egg in a silk bag (55 gp)", "Basilisk egg in a silk bag (55 gp)", "Gold holy symbol of Madeera with a large pearl (60 gp)", "Gold holy symbol of Madeera with a large pearl (60 gp)", "Red dragon mask with gold filigree (65 gp)", "Red dragon mask with gold filigree (65 gp)", "Gold censer with hooded, skeletal figures (70 gp)", "Gold censer with hooded, skeletal figures (70 gp)", "Large, marble statue of an armored angel (70 gp)", "Large, marble statue of an armored angel (70 gp)", "Chainmail with several rows of gold links (75 gp)", "Chainmail with several rows of gold links (75 gp)", "Clutch of three green cockatrice eggs (25 gp each)", "Clutch of three green cockatrice eggs (25 gp each)", "Oak lockbox filled to the brim with 80 gp", "Oak lockbox filled to the brim with 80 gp", "Blue silk robe embroidered with silver moons (80 gp)", "Blue silk robe embroidered with silver moons (80 gp)", "Radiant giant pearl (80 gp)", "Radiant giant pearl (80 gp)", "Lantern made of intricate stained glass (80 gp)", "Lantern made of intricate stained glass (80 gp)", "Life-sized, jointed python of polished gold (80 gp)", "Life-sized, jointed python of polished gold (80 gp)", "Life-sized, jointed python of polished gold (80 gp)", "Life-sized, jointed python of polished gold (80 gp)", "Oil painting of a famous bard (85 gp)", "Oil painting of a famous bard (85 gp)", "Chunk of meteorite sculpted into a tentacled idol (85 gp)", "Chunk of meteorite sculpted into a tentacled idol (85 gp)", "Black silk surcoat embroidered with a gold lion (90 gp)", "Black silk surcoat embroidered with a gold lion (90 gp)", "Pair of lustrous pearls in a silver lockbox (90 gp)", "Pair of lustrous pearls in a silver lockbox (90 gp)", "Gilded helm plumed with roc feathers (95 gp)", "Gilded helm plumed with roc feathers (95 gp)", "Hand-drawn bestiary of rare creatures (95 gp)", "Hand-drawn bestiary of rare creatures (95 gp)", "Wyvern hatchling encased in amber (110 gp)", "Wyvern hatchling encased in amber (110 gp)", "Pendant with three lambent pearls (120 gp)", "Pendant with three lambent pearls (120 gp)", "Life-sized, obsidian statue of a galloping horse (120 gp)", "Life-sized, obsidian statue of a galloping horse (120 gp)", "Glittering, faceted emerald (120 gp)", "Glittering, faceted emerald (120 gp)", fmt.Sprintf("%s (150 gp)", utils.I("Potion of Healing")), fmt.Sprintf("%s (150 gp)", utils.I("Potion of Healing")), fmt.Sprintf("%s (200 gp)", utils.I("Potion of Polymorph")), fmt.Sprintf("%s (200 gp)", utils.I("Potion of Polymorph")), "Magic wand, 3rd-tier spell (250 gp)", "Magic wand, 3rd-tier spell (250 gp)", "4th-tier spell scroll (260 gp)", "4th-tier spell scroll (260 gp)", fmt.Sprintf("%s (260 gp)", utils.I("Crystal Ball")), fmt.Sprintf("%s (260 gp)", utils.I("Crystal Ball")), "Magic wand, 4th-tier spell (flaw) (300 gp)", "Magic wand, 4th-tier spell (flaw) (300 gp)", fmt.Sprintf("%s (300 gp)", utils.I("Immovable Rod")), fmt.Sprintf("%s (300 gp)", utils.I("Immovable Rod")), "+2 magic armor (benefit) (300 gp)", "+2 magic armor (benefit) (300 gp)", "+2 mithral magic armor (benefit, virtue) (320 gp)", "+2 mithral magic armor (benefit, virtue) (320 gp)", "Scorpion idol, one Death's Sting blessing (320 gp)", "Scorpion idol, one Death's Sting blessing (320 gp)", "Necromancy circle, one Ghostwalk blessing (350 gp)", "Necromancy circle, one Ghostwalk blessing (350 gp)", "Owl statue, one Arcane Eye blessing (350 gp)", "Owl statue, one Arcane Eye blessing (350 gp)", "+2 magic weapon (benefit, flaw) (500 gp)", "+2 magic weapon (benefit, flaw) (500 gp)", "+3 magic weapon (benefit, virtue) (900 gp)"}
 var treasureTablePlus = []string{"Three tarnished silver plates (5 sp each)", "Soapstone statuette of Gede with crumbled head (3 gp)", "Soapstone statuette of Gede with crumbled head (3 gp)", "Half-empty cask of dwarvish honey mead (5 gp)", "Half-empty cask of dwarvish honey mead (5 gp)", "Damaged chainmail in need of repair (50 gp)", "Damaged chainmail in need of repair (50 gp)", "Five matching, ceremonial greatswords (12 gp each)", "Five matching, ceremonial greatswords (12 gp each)", "Chipped emerald worth half its value (60 gp)", "Chipped emerald worth half its value (60 gp)", "Gold ring with a large, black pearl (65 gp)", "Gold ring with a large, black pearl (65 gp)", "Suit of crimson chainmail with matching shield (70 gp)", "Suit of crimson chainmail with matching shield (70 gp)", "Giant pearl in the mouth of a gold-dipped bat (100 gp)", "Giant pearl in the mouth of a gold-dipped bat (100 gp)", "Stained glass pane of St. Terragnis vs. a dragon (110 gp)", "Stained glass pane of St. Terragnis vs. a dragon (110 gp)", "Marble throne with giant pearl in headrest (115 gp)", "Marble throne with giant pearl in headrest (115 gp)", "Dagger with emerald in the pommel (120 gp)", "Dagger with emerald in the pommel (120 gp)", "A trio of pearls with blue and violet hues (40 gp each)", "A trio of pearls with blue and violet hues (40 gp each)", "Suit of plate mail shaped to look like a minotaur (130 gp)", "Suit of plate mail shaped to look like a minotaur (130 gp)", "Suit of blue plate mail with crashing wave motif (130 gp)", "Suit of blue plate mail with crashing wave motif (130 gp)", "Jade sculpture of a meditating elephant-man (140 gp)", "Jade sculpture of a meditating elephant-man (140 gp)", "Masterwork lute by realm's most famous luthier (140 gp)", "Masterwork lute by realm's most famous luthier (140 gp)", "Dragonbone greataxe with a ruby in pommel (220 gp)", "Dragonbone greataxe with a ruby in pommel (220 gp)", "Gold scarab dotted with miniature emeralds (220 gp)", "Gold scarab dotted with miniature emeralds (220 gp)", "Chest brimming with 230 gp", "Chest brimming with 230 gp", "Silvered staff tipped with a ruby held in a claw (220 gp)", "Silvered staff tipped with a ruby held in a claw (220 gp)", "Only existing painting of an ancient king (240 gp)", "Only existing painting of an ancient king (240 gp)", "Gold pendant bearing a teardrop-cut ruby (240 gp)", "Gold pendant bearing a teardrop-cut ruby (240 gp)", "Giant, egg-shaped emerald (240 gp)", "Giant, egg-shaped emerald (240 gp)", "Silk robe with four pearls as buttons (240 gp)", "Silk robe with four pearls as buttons (240 gp)", "Silver skull with a ruby in the eye (240 gp)", "Silver skull with a ruby in the eye (240 gp)", "Silver skull with a ruby in the eye (240 gp)", "Silver skull with a ruby in the eye (240 gp)", "Mithral suit of elvish chainmail (240 gp)", "Mithral suit of elvish chainmail (240 gp)", "Opalized giant conch shell with silver inlay (250 gp)", "Opalized giant conch shell with silver inlay (250 gp)", "Gold sarcophagus inscribed with lost language (250 gp)", "Gold sarcophagus inscribed with lost language (250 gp)", "Chunk of meteorite wrapped around a ruby (250 gp)", "Chunk of meteorite wrapped around a ruby (250 gp)", "4th-tier spell scroll (260 gp)", "4th-tier spell scroll (260 gp)", "Velvet bag holding a lustrous sapphire (280 gp)", "Velvet bag holding a lustrous sapphire (280 gp)", fmt.Sprintf("2 %s (300 gp)", utils.I("Potions of Healing")), fmt.Sprintf("2 %s (300 gp)", utils.I("Potions of Healing")), "Silver torc with a sapphire and two pearls (360 gp)", "Silver torc with a sapphire and two pearls (360 gp)", "Flawless, dazzling diamond (360 gp)", "Flawless, dazzling diamond (360 gp)", "Taxidermied adult dragon (360 gp)", "Taxidermied adult dragon (360 gp)", "5th-tier spell scroll (360 gp)", "5th-tier spell scroll (360 gp)", fmt.Sprintf("%s(360 gp)", utils.I("Potion of Extirpation ")), fmt.Sprintf("%s(360 gp)", utils.I("Potion of Extirpation ")), "Magic wand, 5th-tier spell (virtue, flaw) (360 gp)", "Magic wand, 5th-tier spell (virtue, flaw) (360 gp)", fmt.Sprintf("Giant diamond, casts %s once without fail (720 gp)", utils.I("wish")), fmt.Sprintf("Giant diamond, casts %s once without fail (720 gp)", utils.I("wish")), fmt.Sprintf("%s (720 gp)", utils.I("Portable Hole")), fmt.Sprintf("%s (720 gp)", utils.I("Portable Hole")), "Ruby-eyed, gold idol, 3 Demonskin blessings (840 gp)", "Ruby-eyed, gold idol, 3 Demonskin blessings (840 gp)", "Scroll of the Covenant, 3 Divine Halo blessings (840 gp)", "Scroll of the Covenant, 3 Divine Halo blessings (840 gp)", fmt.Sprintf("%s (840 gp)", utils.I("Brak's Cube of Perfection")), fmt.Sprintf("%s (840 gp)", utils.I("Brak's Cube of Perfection")), "Richly woven Flying Carpet (840 gp)", "Richly woven Flying Carpet (840 gp)", "+3 mithral magic armor (benefit, virtue) (900 gp)", "+3 mithral magic armor (benefit, virtue) (900 gp)", "+3 magic weapon (2 benefits) (900 gp)", "+3 magic weapon (2 benefits) (900 gp)", fmt.Sprintf("The fearsome %s (1,200 gp)", utils.I("Obsidian Witchknife")), fmt.Sprintf("The fearsome %s (1,200 gp)", utils.I("Obsidian Witchknife")), fmt.Sprintf("The hallowed %s (1,200 gp)", utils.I("Armor of Saint Terragnis")), fmt.Sprintf("The hallowed %s (1,200 gp)", utils.I("Armor of Saint Terragnis")), "The mighty Staff of Ord (1,200 gp)"}
+
+var backgrounds = []string{
+	fmt.Sprintf("%s You grew up in the merciless streets of a large city", utils.B("Urchin.")),
+	fmt.Sprintf("%s There's a price on your head, but you have allies", utils.B("Wanted.")),
+	fmt.Sprintf("%s You know blasphemous secrets and rituals", utils.B("Cult Initiate.")),
+	fmt.Sprintf("%s You have connections, contacts, and debts", utils.B("Thieves' Guild.")),
+	fmt.Sprintf("%s Your people cast you out for supposed crimes", utils.B("Banished.")),
+	fmt.Sprintf("%s An unusual guardian rescued and raised you", utils.B("Orphaned.")),
+	fmt.Sprintf("%s You have a knack and eye for magic", utils.B("Wizard's Apprentice.")),
+	fmt.Sprintf("%s You can easily appraise value and authenticity", utils.B("Jeweler.")),
+	fmt.Sprintf("%s You know plants, medicines, and poisons", utils.B("Herbalist.")),
+	fmt.Sprintf("%s You left the horde, but it never quite left you", utils.B("Barbarian.")),
+	fmt.Sprintf("%s You fought friend and foe alike for your coin", utils.B("Mercenary.")),
+	fmt.Sprintf("%s Pirate, privateer, or merchant — the seas are yours", utils.B("Sailor.")),
+	fmt.Sprintf("%s You're well trained in religious rites and doctrines", utils.B("Acolyte.")),
+	fmt.Sprintf("%s You served as a fighter in an organized army", utils.B("Soldier.")),
+	fmt.Sprintf("%s The woods and wilds are your true home", utils.B("Ranger.")),
+	fmt.Sprintf("%s You survived on stealth, observation, and speed", utils.B("Scout.")),
+	fmt.Sprintf("%s You've traveled far with your charm and talent", utils.B("Minstrel.")),
+	fmt.Sprintf("%s You know much about ancient history and lore", utils.B("Scholar.")),
+	fmt.Sprintf("%s A famous name has opened many doors for you", utils.B("Noble.")),
+	fmt.Sprintf("%s You know anatomy, surgery, and first aid", utils.B("Chirurgeon.")),
+}

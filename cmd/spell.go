@@ -21,11 +21,12 @@ var spellCmd = &cobra.Command{
 	Short: "Generate a random spell.",
 	Long:  `Generate a random spell from a variety of systems.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		resolveSystem()
 		var spell string
-		switch {
-		case system == "mr" || system == "mazerats":
+		switch system {
+		case mazeRatsName:
 			spell = mazerats.GetRandomSpell(verbose)
-		case system == "knave" || system == "k":
+		case knaveName:
 			if spellRandom {
 				spell = knave.GetRandomSpell(verbose)
 			} else {
@@ -33,7 +34,7 @@ var spellCmd = &cobra.Command{
 			}
 		}
 		if verbose {
-			fmt.Printf("\n%s\n\n%s\n", chalk.Underline.TextStyle(fmt.Sprintf("Using %s", systemMap[system])), spell)
+			fmt.Printf("\n%s\n\n%s\n", chalk.Underline.TextStyle(fmt.Sprintf("Using %s", system)), spell)
 		} else {
 			fmt.Println(spell)
 		}

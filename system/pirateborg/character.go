@@ -106,6 +106,30 @@ type Feature interface {
 	String() string
 }
 
+func GenerateCharacter(extra bool) {
+	pc := NewCharacter(extra)
+	fmt.Printf("%s %s\n%s %s\n%s\n%s\n",
+		Red("Name:"), pc.Name,
+		Red("Class:"), pc.Class,
+		pc.Class.Description(),
+		Red("Features:"))
+	for _, feature := range pc.Features {
+		fmt.Println(feature)
+	}
+	fmt.Printf("\n%s %d\n", Red("HP:"), pc.HP)
+	fmt.Printf("%s\n%s\n", Red("Stats:"), pc.Stats)
+	fmt.Printf("%s %s\n", Red("Devil's Luck:"), pc.Class.GetDevilsLuck())
+
+	fmt.Printf("\n%s\n%s", Red("Weapons:"), pc.Weapons)
+	fmt.Printf("%s %s\n", Red("Clothing:"), pc.Clothing)
+	fmt.Printf("%s %s\n", Red("Hat:"), pc.Hat)
+	fmt.Printf("%s\n%s", Red("Equipment:"), pc.Gear)
+	fmt.Printf("%s %s\n", Red("Money:"), pc.Money)
+
+	fmt.Printf("\n%s\n", pc.Character)
+	fmt.Printf("%s %s\n", chalk.Yellow.Color("Thing of Importance:"), pc.ThingOfImportance)
+}
+
 func NewCharacter(additionalClasses ...bool) *PlayerCharacter {
 	pc := &PlayerCharacter{}
 	pc.Class = GetClass(additionalClasses...)
