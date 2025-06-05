@@ -72,7 +72,7 @@ const (
 )
 
 func GetMonsterQuality() MonsterQuality {
-	return []MonsterQuality{BeastlikeQuality, AvianQuality, AmphibiousQuality, DemonicQuality, ArachnidQuality, OozeQuality, InsectoidQuality, DraconicQuality, PlantlikeQuality, ElephantineQuality, UndeadQuality, CrystallineQuality, HumanoidQuality, AngelicQuality, SpectralQuality, StonecarvedQuality, SerpentineQuality, ElementalQuality, PiscineQuality, ReptilianQuality}[utils.TableDie(20)]
+	return []MonsterQuality{BeastlikeQuality, AvianQuality, AmphibiousQuality, DemonicQuality, ArachnidQuality, OozeQuality, InsectoidQuality, DraconicQuality, PlantlikeQuality, ElephantineQuality, UndeadQuality, CrystallineQuality, HumanoidQuality, AngelicQuality, SpectralQuality, StonecarvedQuality, SerpentineQuality, ElementalQuality, PiscineQuality, ReptilianQuality}[utils.TD(20)]
 }
 
 type MonsterStrength string
@@ -105,7 +105,7 @@ const (
 )
 
 func GetMonsterStrength() MonsterStrength {
-	return []MonsterStrength{Attack1Strength, AbsorbsMagicStrength, SwarmStrength, D10DamageStrength, PoisonStingStrength, ConfusingGazeStrength, EatsMetalStrength, RangedAttacksStrength, HighlyIntelligentStrength, CrushingGraspStrength, PsychicBlastStrength, StealthyStrength, PetrifyingGazeStrength, D12DamageStrength, ImpersonationStrength, BlindingAuraStrength, TurnsInvisibleStrength, TwoD6DamageStrength, SwallowsWholeStrength, Attack2Strength}[utils.TableDie(20)]
+	return []MonsterStrength{Attack1Strength, AbsorbsMagicStrength, SwarmStrength, D10DamageStrength, PoisonStingStrength, ConfusingGazeStrength, EatsMetalStrength, RangedAttacksStrength, HighlyIntelligentStrength, CrushingGraspStrength, PsychicBlastStrength, StealthyStrength, PetrifyingGazeStrength, D12DamageStrength, ImpersonationStrength, BlindingAuraStrength, TurnsInvisibleStrength, TwoD6DamageStrength, SwallowsWholeStrength, Attack2Strength}[utils.TD(20)]
 }
 
 type MonsterWeakness string
@@ -138,7 +138,7 @@ const (
 )
 
 func GetMonsterWeakness() MonsterWeakness {
-	return []MonsterWeakness{ColdWeakness, GreedyWeakness, LightWeakness, SaltWeakness, VainWeakness, MirrorsWeakness, ElectricityWeakness, FragileBodyWeakness, SunlightWeakness, SilverWeakness, FireWeakness, FoodWeakness, AcidWeakness, GarlicWeakness, IronWeakness, WaterWeakness, ItsTrueNameWeakness, LoudSoundsWeakness, HolyWaterWeakness, MusicWeakness}[utils.TableDie(20)]
+	return []MonsterWeakness{ColdWeakness, GreedyWeakness, LightWeakness, SaltWeakness, VainWeakness, MirrorsWeakness, ElectricityWeakness, FragileBodyWeakness, SunlightWeakness, SilverWeakness, FireWeakness, FoodWeakness, AcidWeakness, GarlicWeakness, IronWeakness, WaterWeakness, ItsTrueNameWeakness, LoudSoundsWeakness, HolyWaterWeakness, MusicWeakness}[utils.TD(20)]
 }
 
 type MonsterMutation string
@@ -189,11 +189,11 @@ const (
 func GetMonsterMutation(num int) MonsterMutation {
 	switch num {
 	case 1:
-		return []MonsterMutation{ShapechangerMutation, FinsGillsMutation, InsulatingFurMutation, IronlikeScalesMutation, ExtraLimbsMutation, TentaclesMutation, BonelessMutation, GiganticMutation, FlingsSpikesMutation, TwoHeadsMutation, BurrowsMutation, WingsMutation}[utils.TableDie(12)]
+		return []MonsterMutation{ShapechangerMutation, FinsGillsMutation, InsulatingFurMutation, IronlikeScalesMutation, ExtraLimbsMutation, TentaclesMutation, BonelessMutation, GiganticMutation, FlingsSpikesMutation, TwoHeadsMutation, BurrowsMutation, WingsMutation}[utils.TD(12)]
 	case 2:
-		return []MonsterMutation{DoubleDamageMutation, BreathesFireMutation, FastHealingMutation, Attack1Mutation, AC2Mutation, Levels2Mutation, PlusDamageMutation, LifeDrainingMutation, VeryFastMutation, ReflectsSpellsMutation, ElectrifiedWeaponMutation, AcidicMutation}[utils.TableDie(12)]
+		return []MonsterMutation{DoubleDamageMutation, BreathesFireMutation, FastHealingMutation, Attack1Mutation, AC2Mutation, Levels2Mutation, PlusDamageMutation, LifeDrainingMutation, VeryFastMutation, ReflectsSpellsMutation, ElectrifiedWeaponMutation, AcidicMutation}[utils.TD(12)]
 	default:
-		return []MonsterMutation{SpeaksCommonMutation, SpellsMutation, TelepathicMutation, ToxicSporesMutation, SonicBlastsMutation, BurstTeleportsMutation, ParalyticMutation, GeniusMutation, AntimagicMutation, BloodDrainingMutation, FeverMutation, BlessedMutation}[utils.TableDie(12)]
+		return []MonsterMutation{SpeaksCommonMutation, SpellsMutation, TelepathicMutation, ToxicSporesMutation, SonicBlastsMutation, BurstTeleportsMutation, ParalyticMutation, GeniusMutation, AntimagicMutation, BloodDrainingMutation, FeverMutation, BlessedMutation}[utils.TD(12)]
 	}
 }
 
@@ -331,7 +331,7 @@ func MonsterGenerator(level int) RandomMonster {
 		AC: 10 + level,
 	}
 	monster.Level = []int{level - 3, level - 3, level - 2, level - 2, level - 1, level - 1, level, level, level, level,
-		level, level, level, level + 1, level + 1, level + 2, level + 2, level + 3, level + 3, level + 4}[utils.TableDie(20)]
+		level, level, level, level + 1, level + 1, level + 2, level + 2, level + 3, level + 3, level + 4}[utils.TD(20)]
 	monster.Combat = monster.Level
 	if monster.Level < 0 {
 		monster.Level = 0

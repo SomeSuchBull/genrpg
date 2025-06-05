@@ -37,7 +37,7 @@ func monsterMath(level int, monsterType MonsterType) int {
 }
 
 func weightedTwoToTwelve(adjustment int, monsterType MonsterType) int {
-	res := utils.D(6) + utils.D(6) + adjustment
+	res := utils.D(6, 2) + adjustment
 	if res < 2 {
 		res = 2
 	}

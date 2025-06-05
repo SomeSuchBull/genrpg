@@ -108,7 +108,7 @@ func (z *Zealot) getStartingFeature() {
 		Description: "Thou may use ancient relics and arcane rituals whilst wearing medium armor " + I("(tier 2 or lower)") + "."})
 	z.Features = append(z.Features, ZealotFeature{Name: "Whom dost thou serve?", Description: []string{
 		"THE ONE TRUE GOD", "MOTHER NATURE", "THE ANCIENT GODS", "CHAOS", "THE DEEP", "THE DARK ONE", "THE CHURCH", "THE GREAT OLD ONE",
-	}[utils.TableDie(8)]})
+	}[utils.TD(8)]})
 	z.Features = append(z.Features, ZealotFeature{Name: "PRAYING " + I(chalk.Magenta.Color("SPELLCASTING")),
 		Description: "Thou may use prayers " + B("d2+SPIRIT") + " times a day (reroll when dawn breaks). It consumes thy action to pray, but doth not require a roll or test.\nSpells:"})
 

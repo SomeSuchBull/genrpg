@@ -59,7 +59,7 @@ func NewNamedMagicItem(seed NamedMagicItem) NamedMagicItem {
 		*seed.Benefit = getUtilityBenefit()
 	}
 	if seed.Curse != nil {
-		*seed.Curse = magicUtilityCurses[utils.TableDie(12)]
+		*seed.Curse = magicUtilityCurses[utils.TD(12)]
 	}
 	resolvePersonality(&seed.Personality)
 	return seed
@@ -80,7 +80,7 @@ func resolvePersonality(seed *MagicItemPersonality) {
 		*seed.Flaw = magicItemFlaw()
 	}
 	if seed.Trait != nil {
-		*seed.Trait = magicItemTraits[utils.TableDie(16)]
+		*seed.Trait = magicItemTraits[utils.TD(16)]
 	}
 }
 
@@ -101,10 +101,10 @@ func (p MagicItemPersonality) String() string {
 var magicItemVirtues = [][2]any{{"Insists on protecting people and creatures it likes", nil}, {"Warns its wielder if it senses impending danger", nil}, {"Gladly translates Primordial for its wielder", nil}, {"Senses hiding creatures within near, but not exact place", nil}, {"Owed a favor by a", []string{"unicorn", "unicorn", "dragon", "noble"}}, {"Commands the respect of the followers of a god", nil}, {"Occasionally remembers useful ancient history", nil}, {"Imparts pleasant dreams and good sleep to its wielder", nil}, {"Coaches its wielder on the right things to say in a situation", nil}, {"Sometimes provides helpful strategic advice", nil}, {"Occasionally notices important details others have missed", nil}, {"Tries to mediate disagreements between conscious items", nil}, {"Calming presence to", []string{"dogs", "horses", "cats", "birds"}}, {"Has an extremely acute sense of smell", nil}, {"Knows the direction of the nearest running water", nil}, {"Lawful, intimidating to chaotic creatures", nil}, {"Neutral, intimidating to lawful and chaotic creatures", nil}, {"Chaotic, intimidating to lawful creatures", nil}, {"Has legitimate prophecies but isn't sure of their meaning", nil}, {"Can undo a great", []string{"evil", "lie", "spell", "alliance"}}}
 
 func magicItemVirtue() string {
-	virtue := magicItemVirtues[utils.TableDie(20)]
+	virtue := magicItemVirtues[utils.TD(20)]
 	output := virtue[0].(string)
 	if virtue[1] != nil {
-		output += " " + virtue[1].([]string)[utils.TableDie(4)]
+		output += " " + virtue[1].([]string)[utils.TD(4)]
 	}
 	return output
 }
@@ -112,10 +112,10 @@ func magicItemVirtue() string {
 var magicItemFlaws = [][2]any{{"Afraid of", []string{"the dark", "vermin", "heights", "water"}}, {"Preferred a past owner and always draws comparisons", nil}, {"Chatters while wielder is trying to concentrate", nil}, {"Dislikes", []string{"elves", "dwarves", "humans", "goblins"}}, {"Tries to get wielder into fights so it \"has something to do\"", nil}, {"Does not want to be separated from wielder for any reason", nil}, {"Objects to", []string{"gambling", "carousing", "stealth", "theft"}}, {"Accuses everyone of lying; is correct once in a while", nil}, {"Won't harm creatures", []string{"lawful", "lawful", "neutral", "chaotic"}}, {"Believes its wielder is a pawn in its apocalyptic scheme", nil}, {"Constantly tries to escape its current wielder", nil}, {"Demands its wielder observe its god's strict rituals", nil}, {"Insists on being reunited with its creator, living or dead", nil}, {"Can't stand other conscious magic items", nil}, {"Refuses to be used for \"unimportant\" or \"boring\" tasks", nil}, {"Purposefully goes magically inert when mad at its wielder", nil}, {"Insists on being meticulously cleaned every day", nil}, {"Loves the color purple and despises all other colors", nil}, {"Objects to", []string{"negotiating", "fighting", "fighting", "planning"}}, {"Pretends to know information it doesn't know", nil}}
 
 func magicItemFlaw() string {
-	flaw := magicItemFlaws[utils.TableDie(20)]
+	flaw := magicItemFlaws[utils.TD(20)]
 	output := flaw[0].(string)
 	if flaw[1] != nil {
-		output += " " + flaw[1].([]string)[utils.TableDie(4)]
+		output += " " + flaw[1].([]string)[utils.TD(4)]
 	}
 	return output
 }
@@ -145,7 +145,7 @@ func (a *MagicItemArmor) Init() {
 func NewMagicArmor(seed MagicItemArmor) MagicItemArmor {
 	if seed.Bonus == nil {
 		seed.Bonus = new(int)
-		switch utils.D(6) + utils.D(6) {
+		switch utils.D(6, 2) {
 		case 2, 3, 4, 5:
 			*seed.Bonus = 0
 		case 6, 7, 8:
@@ -157,7 +157,7 @@ func NewMagicArmor(seed MagicItemArmor) MagicItemArmor {
 		}
 	}
 	if seed.Type == "" {
-		switch utils.D(6) + utils.D(6) {
+		switch utils.D(6, 2) {
 		case 2, 3, 4, 5:
 			seed.Type = "Leather"
 		case 6, 7:
@@ -174,20 +174,20 @@ func NewMagicArmor(seed MagicItemArmor) MagicItemArmor {
 		}
 	}
 	if seed.Feature == "" {
-		seed.Feature = magicArmorFeatures[utils.TableDie(20)]
+		seed.Feature = magicArmorFeatures[utils.TD(20)]
 	}
 	if seed.Benefit != nil {
-		*seed.Benefit = magicArmorBenefits[utils.TableDie(12)]
+		*seed.Benefit = magicArmorBenefits[utils.TD(12)]
 	}
 	if seed.Curse != nil {
-		*seed.Curse = magicArmorCurses[utils.TableDie(len(magicArmorCurses))]
+		*seed.Curse = magicArmorCurses[utils.TD(len(magicArmorCurses))]
 	}
 	resolvePersonality(&seed.Personality)
 	return seed
 }
 
 func mithralArmor() string {
-	switch utils.D(6) + utils.D(6) {
+	switch utils.D(6, 2) {
 	case 6, 7:
 		return "Chain mail"
 	case 8, 9:
@@ -261,21 +261,21 @@ var magicPotionBenefits = [][2]any{{"Immune to %s for 5 rounds", []string{"fire"
 var magicPotionCurses = [][2]any{{"DC 15 WIS check or attack nearest creature for 3 rounds", nil}, {"Turn into a 1 HP newt for 3 rounds", nil}, {"A stat becomes 3 (-4) for 1 hour", nil}, {"DC 15 CON check or take 2d10 damage", nil}, {"Forget all languages you know for 1 hour", nil}, {"Shrink to half size and disadvantage on attacks for 5 rounds", nil}, {"Sing at the top of your lungs for 3 rounds", nil}, {"You become magnetic to all metal near to you for 1 hour", nil}, {"You are compelled to jump into any pits you see for 1 hour", nil}, {"DC 15 CON check or go blind for 5 rounds", nil}, {"You are the source of an antimagic shell spell for 1 hour", nil}, {"%s petrify for 5 rounds", []string{"Arms", "Legs"}}}
 
 func getPotionBenefit() string {
-	entry := magicPotionBenefits[utils.TableDie(12)]
+	entry := magicPotionBenefits[utils.TD(12)]
 	benefit := entry[0].(string)
 	if entry[1] != nil {
 		options := entry[1].([]string)
-		benefit = fmt.Sprintf(entry[0].(string), options[utils.TableDie(len(options))])
+		benefit = fmt.Sprintf(entry[0].(string), options[utils.TD(len(options))])
 	}
 	return benefit
 }
 
 func getPotionCurse() string {
-	entry := magicPotionCurses[utils.TableDie(len(magicPotionCurses))]
+	entry := magicPotionCurses[utils.TD(len(magicPotionCurses))]
 	benefit := entry[0].(string)
 	if entry[1] != nil {
 		options := entry[1].([]string)
-		benefit = fmt.Sprintf(entry[0].(string), options[utils.TableDie(len(options))])
+		benefit = fmt.Sprintf(entry[0].(string), options[utils.TD(len(options))])
 	}
 	return benefit
 }
@@ -306,27 +306,27 @@ func NewMagicScrollWand(seed MagicItemScrollWand) MagicItemScrollWand {
 	if seed.SpellTier != 0 {
 		switch seed.SpellTier {
 		case 1:
-			seed.Spell = tier1spells[utils.TableDie(len(tier1spells))]
+			seed.Spell = tier1spells[utils.TD(len(tier1spells))]
 		case 2:
-			seed.Spell = tier2spells[utils.TableDie(len(tier2spells))]
+			seed.Spell = tier2spells[utils.TD(len(tier2spells))]
 		case 3:
-			seed.Spell = tier3spells[utils.TableDie(len(tier3spells))]
+			seed.Spell = tier3spells[utils.TD(len(tier3spells))]
 		case 4:
-			seed.Spell = tier4spells[utils.TableDie(len(tier4spells))]
+			seed.Spell = tier4spells[utils.TD(len(tier4spells))]
 		case 5:
-			seed.Spell = tier5spells[utils.TableDie(len(tier5spells))]
+			seed.Spell = tier5spells[utils.TD(len(tier5spells))]
 		}
 	}
 	if seed.Feature == "" {
 		switch {
 		case strings.Contains(seed.Name, "scroll"):
-			seed.Feature = magicScrollFeatures[utils.TableDie(len(magicScrollFeatures))]
+			seed.Feature = magicScrollFeatures[utils.TD(len(magicScrollFeatures))]
 		case strings.Contains(seed.Name, "wand"):
-			seed.Feature = magicWandFeatures[utils.TableDie(len(magicWandFeatures))]
+			seed.Feature = magicWandFeatures[utils.TD(len(magicWandFeatures))]
 		}
 	}
 	if seed.Benefit != nil {
-		switch utils.D(6) + utils.D(6) {
+		switch utils.D(6, 2) {
 		case 12:
 			*seed.Benefit = getWeaponBenefit()
 		case 9, 10, 11:
@@ -334,19 +334,19 @@ func NewMagicScrollWand(seed MagicItemScrollWand) MagicItemScrollWand {
 		case 7, 8:
 			*seed.Benefit = getPotionBenefit()
 		default:
-			*seed.Benefit = magicArmorBenefits[utils.TableDie(12)]
+			*seed.Benefit = magicArmorBenefits[utils.TD(12)]
 		}
 	}
 	if seed.Curse != nil {
-		switch utils.D(6) + utils.D(6) {
+		switch utils.D(6, 2) {
 		case 12:
 			*seed.Curse = getWeaponCurse()
 		case 9, 10, 11:
-			*seed.Curse = magicUtilityCurses[utils.TableDie(len(magicUtilityCurses))]
+			*seed.Curse = magicUtilityCurses[utils.TD(len(magicUtilityCurses))]
 		case 7, 8:
 			*seed.Curse = getPotionCurse()
 		default:
-			*seed.Curse = magicArmorCurses[utils.TableDie(len(magicArmorCurses))]
+			*seed.Curse = magicArmorCurses[utils.TD(len(magicArmorCurses))]
 		}
 	}
 	resolvePersonality(&seed.Personality)
@@ -383,12 +383,12 @@ func (s *MagicItemScrollWand) String() string {
 
 func (s *MagicItemScrollWand) HasBenefit(num ...int) {
 	s.Benefit = new(string)
-	*s.Benefit = magicArmorBenefits[utils.TableDie(12)]
+	*s.Benefit = magicArmorBenefits[utils.TD(12)]
 }
 
 func (s *MagicItemScrollWand) HasCurse() {
 	s.Curse = new(string)
-	*s.Curse = magicArmorCurses[utils.TableDie(len(magicArmorCurses))]
+	*s.Curse = magicArmorCurses[utils.TD(len(magicArmorCurses))]
 }
 
 func (s *MagicItemScrollWand) SetPersonality(p MagicItemPersonality) {
@@ -410,11 +410,11 @@ var magicUtilityBenefits = [][2]any{{"You can't be magically scryed upon or dete
 var magicUtilityCurses = []string{"Slowly rots all other non-magical items that touch it", "Deals 1d4 damage and leaves blisters whenever used", "Item attracts bad weather to its location", "You cannot be healed by magic; only by resting", "Crashes like a gong whenever wielder slays a creature", "Item attracts all undead within a far distance", "Temporarily loses magic if doused in water", "You have disadvantage on CON checks", "You are compelled to light parchment objects on fire", "You must drink blood once a day or take 1d8 damage", "Item must eat 1d10 gp a day or it loses its magic until fed", "Item has horrid smell that makes all your CHA checks hard"}
 
 func getUtilityBenefit() string {
-	entry := magicUtilityBenefits[utils.TableDie(12)]
+	entry := magicUtilityBenefits[utils.TD(12)]
 	benefit := entry[0].(string)
 	if entry[1] != nil {
 		options := entry[1].([]string)
-		benefit = fmt.Sprintf(entry[0].(string), options[utils.TableDie(len(options))])
+		benefit = fmt.Sprintf(entry[0].(string), options[utils.TD(len(options))])
 	}
 	return benefit
 }
@@ -437,7 +437,7 @@ var magicWeaponCurses = [][2]any{{"You can't see", []string{"undead", "demons", 
 func getWeaponBenefit(iter ...int) string {
 	var roll int
 	if len(iter) == 0 {
-		roll = utils.TableDie(12)
+		roll = utils.TD(12)
 	} else {
 		roll = iter[0]
 	}
@@ -445,17 +445,17 @@ func getWeaponBenefit(iter ...int) string {
 	benefit := entry[0].(string)
 	if entry[1] != nil {
 		options := entry[1].([]string)
-		benefit += " " + options[utils.TableDie(len(options))]
+		benefit += " " + options[utils.TD(len(options))]
 	}
 	return benefit
 }
 
 func getWeaponCurse() string {
-	entry := magicWeaponBenefits[utils.TableDie(len(magicWeaponCurses))]
+	entry := magicWeaponBenefits[utils.TD(len(magicWeaponCurses))]
 	benefit := entry[0].(string)
 	if entry[1] != nil {
 		options := entry[1].([]string)
-		benefit += " " + options[utils.TableDie(len(options))]
+		benefit += " " + options[utils.TD(len(options))]
 	}
 	return benefit
 }
@@ -467,7 +467,7 @@ func (w *MagicItemWeapon) Init() {
 func NewMagicWeapon(seed MagicItemWeapon) MagicItemWeapon {
 	if seed.Bonus == nil {
 		seed.Bonus = new(int)
-		switch utils.D(6) + utils.D(6) {
+		switch utils.D(6, 2) {
 		case 2, 3:
 			*seed.Bonus = 0
 		case 4, 5, 6, 7, 8, 9:
@@ -479,13 +479,13 @@ func NewMagicWeapon(seed MagicItemWeapon) MagicItemWeapon {
 		}
 	}
 	if seed.Type == "" {
-		seed.Type = magicWeaponTypes[utils.TableDie(20)]
+		seed.Type = magicWeaponTypes[utils.TD(20)]
 	}
 	if seed.Type == "Arrows" || seed.Type == "Crossbow bolts" {
 		seed.Type += fmt.Sprintf(" (#: %d)", utils.D(6)+utils.D(6))
 	}
 	if seed.Feature == "" {
-		seed.Feature = magicWeaponFeatures[utils.TableDie(20)]
+		seed.Feature = magicWeaponFeatures[utils.TD(20)]
 	}
 	if seed.Benefits != nil {
 		var rolls []int
@@ -548,7 +548,7 @@ func (w *MagicItemWeapon) SetPersonality(p MagicItemPersonality) {
 }
 
 func recursiveConsumedRoll(rolls []int, size, iter int) int {
-	roll := utils.TableDie(size)
+	roll := utils.TD(size)
 	if slices.Contains(rolls, roll) && iter < size {
 		return recursiveConsumedRoll(rolls, size, iter+1)
 	}

@@ -59,7 +59,7 @@ func (t *Thief) Spellcaster() bool { return false }
 // func (t *Thief) Assign(pc *PlayerCharacter) { t.pc = pc }
 
 func (t *Thief) RollTalent() {
-	switch utils.D(6) + utils.D(6) {
+	switch utils.D(6, 2) {
 	case 2:
 		t.talents = append(t.talents, "Gain advantage on initiative rolls (reroll if duplicate)")
 	case 3, 4, 5:

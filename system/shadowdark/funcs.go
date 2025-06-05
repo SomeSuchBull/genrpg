@@ -13,11 +13,11 @@ import (
 var stockingEngine = []func(int, ...Biome) string{getEmpty, getEmpty, getTrap, getMinorHazard, getSoloMonster, getNPC, getMonsterMob, getMajorHazard, getTreasure, getBossMonster}
 
 func Stocking(rooms int64, level int) {
-	biome := GetBiomes()[utils.TableDie(len(GetBiomes()))]
+	biome := GetBiomes()[utils.TD(len(GetBiomes()))]
 	fmt.Println("Biome:", biome)
 	for i := 1; i < int(rooms)+1; i++ {
 		roomContents := ""
-		roll := utils.TableDie(10)
+		roll := utils.TD(10)
 		f := stockingEngine[roll]
 		roomContents += f(level, biome)
 		// roomContents += getTreasure(level, biome)
@@ -52,19 +52,19 @@ func getTrap(level int, biomes ...Biome) string {
 }
 
 func getTreasure(level int, biomes ...Biome) string {
-	roll := utils.TableDie(6)
+	roll := utils.TD(6)
 	detail := mapsTreasure[roll]
 	var encounter string
 	var treasure string
 	switch {
 	case level <= 3:
-		treasure = treasureTable03[utils.TableDie(100)]
+		treasure = treasureTable03[utils.TD(100)]
 	case level <= 6:
-		treasure = treasureTable46[utils.TableDie(100)]
+		treasure = treasureTable46[utils.TD(100)]
 	case level <= 9:
-		treasure = treasureTable79[utils.TableDie(100)]
+		treasure = treasureTable79[utils.TD(100)]
 	default:
-		treasure = treasureTablePlus[utils.TableDie(100)]
+		treasure = treasureTablePlus[utils.TD(100)]
 	}
 	var seed MagicItem
 	switch {
@@ -121,12 +121,12 @@ func getTreasure(level int, biomes ...Biome) string {
 	}
 	switch roll {
 	case 2, 3:
-		f := []func(int, ...Biome) string{getMonsterMob, getSoloMonster}[utils.TableDie(2)]
+		f := []func(int, ...Biome) string{getMonsterMob, getSoloMonster}[utils.TD(2)]
 		encounter += fmt.Sprintf("\n%s", f(level, biomes...))
 	case 4:
 		encounter += fmt.Sprintf("\n%s", getTrap(level, biomes...))
 	case 5:
-		f := []func(int, ...Biome) string{getMinorHazard, getMinorHazard, getMajorHazard}[utils.TableDie(3)]
+		f := []func(int, ...Biome) string{getMinorHazard, getMinorHazard, getMajorHazard}[utils.TD(3)]
 		encounter += fmt.Sprintf("\n%s", f(level, biomes...))
 	}
 	return fmt.Sprintf("%s, %s\n%s", utils.B("Treasure"), detail, encounter)
@@ -139,10 +139,10 @@ func getTreasure(level int, biomes ...Biome) string {
 func getMinorHazard(level int, biomes ...Biome) string {
 	var hazard string
 	tables := [3]string{"Movement", "Damage", "Weaken"}
-	roll := utils.TableDie(3)
+	roll := utils.TD(3)
 	tableName := tables[roll]
 	table := hazards[roll]
-	hazard = fmt.Sprintf("%s: %s", tableName, table[utils.TableDie(len(table))])
+	hazard = fmt.Sprintf("%s: %s", tableName, table[utils.TD(len(table))])
 	hazardDetail := fmt.Sprintf("%s", mapsMinorHazard[rand.Intn(len(mapsMinorHazard))])
 	return fmt.Sprintf("%s, %s\n%s", utils.B("Minor Hazard"), hazardDetail, hazard)
 }
@@ -162,7 +162,7 @@ func getSoloMonster(level int, biomes ...Biome) string {
 }
 
 func getNPC(level int, biomes ...Biome) string {
-	tableRoll := utils.TableDie(6)
+	tableRoll := utils.TD(6)
 	detail := mapsNpc[tableRoll]
 	var encounter string
 	if tableRoll == 5 {
@@ -221,10 +221,10 @@ func getMonsterMob(level int, biomes ...Biome) string {
 func getMajorHazard(level int, biomes ...Biome) string {
 	var hazard string
 	tables := [3]string{"Movement", "Damage", "Weaken"}
-	roll := utils.TableDie(3)
+	roll := utils.TD(3)
 	tableName := tables[roll]
 	table := hazards[roll]
-	hazard = fmt.Sprintf("%s: %s", tableName, table[utils.TableDie(len(table))])
+	hazard = fmt.Sprintf("%s: %s", tableName, table[utils.TD(len(table))])
 	hazardDetail := fmt.Sprintf("%s", mapsMajorHazard[rand.Intn(len(mapsMajorHazard))])
 	return fmt.Sprintf("%s, %s\n%s", utils.B("Major Hazard"), hazardDetail, hazard)
 }
@@ -239,7 +239,7 @@ func getBossMonster(level int, biomes ...Biome) string {
 	if maxThreatLevel < minThreatLevel {
 		maxThreatLevel = minThreatLevel
 	}
-	detailsRoll := utils.TableDie(6)
+	detailsRoll := utils.TD(6)
 	hasHelp := false
 	if slices.Contains([]int{2, 3, 4}, detailsRoll) {
 		hasHelp = true

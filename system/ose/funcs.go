@@ -18,7 +18,7 @@ var engine = map[int]func() string{
 func Stocking(rooms int64) {
 	for i := int64(0); i < rooms; i++ {
 		roomContents := ""
-		roll := utils.TableDie(6)
+		roll := utils.TD(6)
 		f := engine[roll]
 		roomContents += f()
 		fmt.Printf("%03d: %s\n", i+1, roomContents)

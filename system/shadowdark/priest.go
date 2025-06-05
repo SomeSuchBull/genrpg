@@ -65,7 +65,7 @@ func (p *Priest) Spellcaster() bool { return false }
 // func (p *Priest) Assign(pc *PlayerCharacter) { p.pc = pc }
 
 func (p *Priest) RollTalent() {
-	switch utils.D(6) + utils.D(6) {
+	switch utils.D(6, 2) {
 	case 2:
 		p.talents = append(p.talents, "Gain advantage on casting one spell you know")
 	case 3, 4, 5, 6:

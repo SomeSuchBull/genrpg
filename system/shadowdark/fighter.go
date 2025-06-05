@@ -60,7 +60,7 @@ func (f *Fighter) Spellcaster() bool { return false }
 // func (f *Fighter) Assign(pc *PlayerCharacter) { f.pc = pc }
 
 func (f *Fighter) RollTalent() {
-	switch utils.D(6) + utils.D(6) {
+	switch utils.D(6, 2) {
 	case 2:
 		f.talents = append(f.talents, "Gain Weapon Mastery with one additional weapon type")
 	case 3, 4, 5, 6:

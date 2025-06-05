@@ -60,7 +60,7 @@ func GetRandomSpell(verbose bool) string {
 	spellParts := []string{}
 	rolls := [2]int{}
 	for i := 0; i < 2; i++ {
-		rolls[i] = utils.TableDie(6)
+		rolls[i] = utils.TD(6)
 	}
 	spellRecipeOutput := getSpellRecipeOutput(rolls[0], rolls[1])
 	spellRecipeOutputParts := strings.Split(spellRecipeOutput, " + ")
@@ -68,7 +68,7 @@ func GetRandomSpell(verbose bool) string {
 	// verboseOutput += "Table | Rolls | Result\n"
 	for i, f := range getSpellRecipe(rolls[0], rolls[1]) {
 		for ii := 0; ii < 2; ii++ {
-			rolls[ii] = utils.TableDie(6)
+			rolls[ii] = utils.TD(6)
 		}
 		spellParts = append(spellParts, f(rolls[0], rolls[1]))
 		verboseOutput += fmt.Sprintf("%s | %s | %s\n\n",

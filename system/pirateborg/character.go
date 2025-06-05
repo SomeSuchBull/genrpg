@@ -524,7 +524,7 @@ func GetBackgroundList() []CharacterBackground {
 }
 
 func RollBackground() CharacterBackground {
-	r := utils.TableDie(100)
+	r := utils.TD(100)
 	if r < 19 {
 		r = 19
 	}
@@ -532,20 +532,20 @@ func RollBackground() CharacterBackground {
 	return GetBackgroundList()[r]
 }
 func RollDistinctiveFlaw() string {
-	return distinctiveFlaws[utils.TableDie(20)]
+	return distinctiveFlaws[utils.TD(20)]
 }
 func RollPhysicalTrademark() string {
-	return physicalTrademarks[utils.TableDie(20)]
+	return physicalTrademarks[utils.TD(20)]
 }
 func RollIdiosyncrasy() string {
-	return idiosyncrasies[utils.TableDie(20)]
+	return idiosyncrasies[utils.TD(20)]
 }
 func RollUnfortunateIncident() string {
-	return unfortunateIncidents[utils.TableDie(20)]
+	return unfortunateIncidents[utils.TD(20)]
 }
 
 func RollThingOfImportance() string {
-	return thingsOfImportance[utils.TableDie(100)]
+	return thingsOfImportance[utils.TD(100)]
 }
 
 func (pc *PlayerCharacter) GetRandomName() {

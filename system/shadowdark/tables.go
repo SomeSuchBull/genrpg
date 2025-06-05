@@ -239,18 +239,18 @@ func NewRivalParty(level int) RivalParty {
 		Characters: make([]Character, 0),
 		Alignment:  rivalPartyAlignment[rand.Intn(len(rivalPartyAlignment))],
 		Renown:     rivalPartyRenown[rand.Intn(len(rivalPartyRenown))],
-		Secret:     rivalPartySecret[utils.TableDie(6)+utils.TableDie(6)],
+		Secret:     rivalPartySecret[utils.TD(6)+utils.TD(6)],
 		Wealth:     rivalPartyWealth[rand.Intn(len(rivalPartyWealth))],
-		Name:       fmt.Sprintf("%s %s", rivalPartyName[0][utils.TableDie(20)], rivalPartyName[1][utils.TableDie(20)]),
+		Name:       fmt.Sprintf("%s %s", rivalPartyName[0][utils.TD(20)], rivalPartyName[1][utils.TD(20)]),
 		KnownFor:   rivalPartyKnownFor[rand.Intn(len(rivalPartyKnownFor))],
 	}
-	r.SignatureTactics = rivalPartySignatureTactics[r.Alignment][utils.TableDie(4)]
+	r.SignatureTactics = rivalPartySignatureTactics[r.Alignment][utils.TD(4)]
 	if level == 0 {
 		r.Level = utils.D(6)
 	}
 	for i := 0; i < utils.D(4)+1; i++ {
 		char := Character{Ancestry: rivalAncestry[rand.Intn(len(rivalAncestry))], Class: rivalClass[rand.Intn(len(rivalClass))]}
-		char.Name = npcNames[char.Ancestry.Name][utils.TableDie(20)]
+		char.Name = npcNames[char.Ancestry.Name][utils.TD(20)]
 		r.Characters = append(r.Characters, char)
 	}
 	return r

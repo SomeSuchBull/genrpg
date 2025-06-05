@@ -4,6 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"github.com/genrpg/system/mothership"
 	"github.com/genrpg/system/pirateborg"
 	"github.com/genrpg/system/shadowdark"
 	"github.com/spf13/cobra"
@@ -24,6 +25,8 @@ var charCmd = &cobra.Command{
 			pirateborg.GenerateCharacter(extra)
 		case shadowDarkName:
 			shadowdark.GenerateCharacter(optimized, extra)
+		case mothershipName:
+			mothership.NewPC()
 		default:
 			cmd.Help()
 		}
@@ -33,5 +36,5 @@ var charCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(charCmd)
 	charCmd.Flags().BoolVarP(&extra, "extra", "e", false, "Generates a character from extra character options.")
-	charCmd.Flags().BoolVarP(&optimized, "optimized", "op", false, "Generates a character picking optimal options depending on stats.")
+	// charCmd.Flags().BoolVarP(&optimized, "optimized", "op", false, "Generates a character picking optimal options depending on stats.")
 }

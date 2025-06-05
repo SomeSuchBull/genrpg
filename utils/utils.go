@@ -14,10 +14,21 @@ type StockingContext struct {
 	Level int
 }
 
-var TableDie = rand.Intn
+var TD = rand.Intn
 
-func D(dieSize int) int {
-	return TableDie(dieSize) + 1
+func D(args ...int) int {
+	switch len(args) {
+	default:
+		return 0
+	case 1:
+		return TD(args[0]) + 1
+	case 2:
+		result := 0
+		for range args[1] {
+			result += TD(args[0])
+		}
+		return result + args[1]
+	}
 }
 
 func Chance(size int, c ...int) (happened int) {

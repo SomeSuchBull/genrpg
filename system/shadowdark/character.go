@@ -114,7 +114,7 @@ func (pc *PlayerCharacter) GetAlignment() {
 }
 
 func (pc *PlayerCharacter) GetBackground() {
-	pc.Background = Background(backgrounds[utils.TableDie(len(backgrounds))])
+	pc.Background = Background(backgrounds[utils.TD(len(backgrounds))])
 }
 
 func (pc *PlayerCharacter) GetGear() {}

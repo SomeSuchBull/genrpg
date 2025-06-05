@@ -61,7 +61,7 @@ func (w *Wizard) Spellcaster() bool { return false }
 // func (w *Wizard) Assign(pc *PlayerCharacter) { w.pc = pc }
 
 func (w *Wizard) RollTalent() {
-	switch utils.D(6) + utils.D(6) {
+	switch utils.D(6, 2) {
 	case 2:
 		w.talents = append(w.talents, "Make 1 random magic item of a type you choose (pg. 282)")
 	case 3, 4, 5, 6, 7:

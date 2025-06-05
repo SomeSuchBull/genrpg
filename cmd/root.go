@@ -17,6 +17,7 @@ var mazeRatsName = "Maze Rats by Ben Milton"
 var knaveName = "Knave 2nd edition by Ben Milton"
 var shadowDarkName = "ShadowDark by Kelsey Dionne"
 var pirateBorgName = "PIRATE BORG by Limithron"
+var mothershipName = "Mothership by Tuesday Knight Games"
 
 var systemMap = map[string]string{
 	"mr":          mazeRatsName,
@@ -28,6 +29,8 @@ var systemMap = map[string]string{
 	"pirate-borg": pirateBorgName,
 	"pirateborg":  pirateBorgName,
 	"pb":          pirateBorgName,
+	"mothership":  mothershipName,
+	"ms":          mothershipName,
 }
 
 func resolveSystem() {

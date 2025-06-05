@@ -46,11 +46,11 @@ func (p Pirate) String() string {
 func PirateName() string {
 	var firstName string
 	if utils.D(2) == 1 {
-		firstName = pirateMaleName[utils.TableDie(36)]
+		firstName = pirateMaleName[utils.TD(36)]
 	} else {
-		firstName = pirateFemaleName[utils.TableDie(36)]
+		firstName = pirateFemaleName[utils.TD(36)]
 	}
-	return fmt.Sprintf("%s %s \"%s %s\"", firstName, pirateSurname[utils.TableDie(36)], pirateNickname[utils.TableDie(36)], pirateNickname[utils.TableDie(36)])
+	return fmt.Sprintf("%s %s \"%s %s\"", firstName, pirateSurname[utils.TD(36)], pirateNickname[utils.TD(36)], pirateNickname[utils.TD(36)])
 }
 
 func MysticalMishap() string {
@@ -90,7 +90,7 @@ func MysticalMishap() string {
 	case 16:
 		return "The ritual succeeds, but in the worst way possible. GM decides: different target, goes off at the wrong time, you cast it on yourself, etc."
 	case 17:
-		years := fmt.Sprint(utils.D(10) + utils.D(10) + utils.D(10))
+		years := fmt.Sprint(utils.D(10, 2) + utils.D(10))
 		return "Your mind is lost at sea for what seems like " + years + " years, yet no time has passed.\n" + I("Others watch as you age "+years+" years in a matter of seconds")
 	case 18:
 		return "Hundreds of tiny crabs swarm you. They are harmless, and provide an extra -2 armor.\n" + I("They leave after "+fmt.Sprint(utils.D(6))+" days, but return every full moon.")
@@ -124,7 +124,7 @@ func (i Island) String() string {
 
 func GetIsland() Island {
 	return Island{
-		Size:                     islandSize[utils.TableDie(6)],
+		Size:                     islandSize[utils.TD(6)],
 		Terrain:                  islandTerrain[utils.D(6)+utils.D(6)],
 		Vegetation:               islandVegetation[utils.D(6)+utils.D(6)],
 		ProminentNaturalFeature:  islandProminentNaturalFeature[utils.D(6)+utils.D(6)],
@@ -157,15 +157,15 @@ func (ds DerelictShip) String() string {
 
 func GetDerelictShip() DerelictShip {
 	return DerelictShip{
-		WhereIsIt:        derelictShipWhereIsIt[utils.TableDie(12)],
-		TypeOfShip:       derelictShipTypeOfShip[utils.TableDie(12)],
-		WhatHappenedHere: derelictShipWhatHappenedHere[utils.TableDie(8)],
-		InOneOfTheRooms:  derelictShipInOneOfTheRooms[utils.TableDie(8)],
-		OddFeature:       derelictShipOddFeature[utils.TableDie(12)],
-		Development:      derelictShipDevelopment[utils.TableDie(8)],
-		CurrentOccupant:  derelictShipCurrentOccupant[utils.TableDie(12)],
-		OriginalCargo:    derelictShipOriginalCargo[utils.TableDie(20)],
-		CargoCondition:   derelictShipCargoCondition[utils.TableDie(6)],
+		WhereIsIt:        derelictShipWhereIsIt[utils.TD(12)],
+		TypeOfShip:       derelictShipTypeOfShip[utils.TD(12)],
+		WhatHappenedHere: derelictShipWhatHappenedHere[utils.TD(8)],
+		InOneOfTheRooms:  derelictShipInOneOfTheRooms[utils.TD(8)],
+		OddFeature:       derelictShipOddFeature[utils.TD(12)],
+		Development:      derelictShipDevelopment[utils.TD(8)],
+		CurrentOccupant:  derelictShipCurrentOccupant[utils.TD(12)],
+		OriginalCargo:    derelictShipOriginalCargo[utils.TD(20)],
+		CargoCondition:   derelictShipCargoCondition[utils.TD(6)],
 	}
 }
 
@@ -196,13 +196,13 @@ func (v Vessel) String() string {
 
 func GetVessel() Vessel {
 	var originalCargo []string
-	vesselClassDie := utils.TableDie(10)
+	vesselClassDie := utils.TD(10)
 	cargoSize := vesselClassCargo[vesselClassDie]
 	for i := 0; i < cargoSize; i++ {
-		cargoDie := utils.TableDie(12)
+		cargoDie := utils.TD(12)
 		var cargo string
 		if cargoDie == 11 {
-			cargo = vesselSpecialCargo[utils.TableDie(12)]
+			cargo = vesselSpecialCargo[utils.TD(12)]
 		} else {
 			cargo = vesselMundaneCargo[cargoDie]
 		}
@@ -210,12 +210,12 @@ func GetVessel() Vessel {
 	}
 	return Vessel{
 		Class:             vesselClass[vesselClassDie],
-		Armament:          vesselArmament[utils.TableDie(6)],
-		CrewQuantity:      vesselCrewQuantity[utils.TableDie(6)],
+		Armament:          vesselArmament[utils.TD(6)],
+		CrewQuantity:      vesselCrewQuantity[utils.TD(6)],
 		CrewQuality:       vesselCrewQuality[utils.D(6)+utils.D(6)],
-		ShipName:          vesselShipName[utils.TableDie(36)],
+		ShipName:          vesselShipName[utils.TD(36)],
 		Cargo:             originalCargo,
-		OptionalPlotTwist: vesselOptionalPlotTwist[utils.TableDie(8)],
+		OptionalPlotTwist: vesselOptionalPlotTwist[utils.TD(8)],
 	}
 }
 
@@ -234,10 +234,10 @@ func (j Job) String() string {
 
 func GetJob() Job {
 	return Job{
-		Hook:          jobsHooks[utils.TableDie(20)],
-		KeyNPC:        jobsKeyNPC[utils.TableDie(10)],
-		Requirement:   jobsRequirements[utils.TableDie(6)],
-		TimeRestraint: jobsTimeRestraint[utils.TableDie(6)],
-		Complication:  jobsComplication[utils.TableDie(6)],
+		Hook:          jobsHooks[utils.TD(20)],
+		KeyNPC:        jobsKeyNPC[utils.TD(10)],
+		Requirement:   jobsRequirements[utils.TD(6)],
+		TimeRestraint: jobsTimeRestraint[utils.TD(6)],
+		Complication:  jobsComplication[utils.TD(6)],
 	}
 }
