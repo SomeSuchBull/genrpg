@@ -51,8 +51,8 @@ func (a *Android) Adjustments() (Stats, Saves, int) {
 	return stats, Saves{Fear: 60}, 1
 }
 
-func (a *Android) Loadout() []Equipment {
-	return nil
+func (a *Android) Loadout() []ItemInterface {
+	return AndroidLoadouts[utils.TD(len(AndroidLoadouts))]
 }
 
 func NewAndroid() *Android {

@@ -42,8 +42,8 @@ func (m *Marine) Adjustments() (Stats, Saves, int) {
 	return Stats{Combat: 10}, Saves{Fear: 20, Body: 10}, 1
 }
 
-func (m *Marine) Loadout() []Equipment {
-	return nil
+func (m *Marine) Loadout() []ItemInterface {
+	return MarineLoadouts[utils.TD(len(MarineLoadouts))]
 }
 
 func NewMarine() *Marine {

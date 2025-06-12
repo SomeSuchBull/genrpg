@@ -47,8 +47,8 @@ func (s *Scientist) Adjustments() (Stats, Saves, int) {
 	return stats, Saves{Sanity: 30}, 0
 }
 
-func (s *Scientist) Loadout() []Equipment {
-	return nil
+func (s *Scientist) Loadout() []ItemInterface {
+	return ScientistLoadouts[utils.TD(len(ScientistLoadouts))]
 }
 
 func NewScientist() *Scientist {

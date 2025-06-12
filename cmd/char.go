@@ -17,7 +17,7 @@ var optimized bool
 var charCmd = &cobra.Command{
 	Use:   "char",
 	Short: "Generate a random character.",
-	Long:  `Generate a random character from a variety of systems. (Only Pirate Borg atm)`,
+	Long:  `Generate a random character from a variety of systems. (Pirate Borg & Mothership atm)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		resolveSystem()
 		switch system {

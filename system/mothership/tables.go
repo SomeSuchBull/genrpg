@@ -1,5 +1,9 @@
 package mothership
 
+import (
+	"fmt"
+)
+
 type SkillType string
 
 const (
@@ -111,7 +115,7 @@ func init() {
 		Computers, ZeroG, Mathematics, Art, Archeology, Theology, MilitaryTraining, Rimwise, Athletics}
 }
 
-type Equipment interface {
+type ItemInterface interface {
 	String() string
 }
 
@@ -136,7 +140,7 @@ type Weapon struct {
 }
 
 func (w Weapon) String() string {
-	return w.Name
+	return fmt.Sprintf("%s [WEAPON]", w.Name)
 }
 
 type Armor struct {
@@ -150,16 +154,26 @@ type Armor struct {
 }
 
 func (a Armor) String() string {
-	return a.Name
+	return fmt.Sprintf("%s [ARMOR]", a.Name)
 }
 
 var (
 	// Armor
-	StandardCrewAttire  = Armor{Name: "Standard Crew Attire", Description: "Basic clothing.", Cost: "100cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
-	Vaccsuit            = Armor{Name: "Vaccsuit", Description: "Designed for outer space operations", Cost: "10kcr", ArmorPoints: 3, O2: "12 hrs", Speed: "[-]", Special: "Includes short-range comms, headlamp, and radiation shielding. Decompression within 1d5 rounds if punctured."}
-	HazardSuit          = Armor{Name: "Hazard Suit", Description: "Environmental protection while exploring unknown planets.", Cost: "4kcr", ArmorPoints: 5, O2: "1 hr", Speed: "Normal", Special: "Includes air filter, extreme heat/cold protection, hydration reclamation (1L of water lasts 4 days), short-range comms, headlamp, and radiation shielding."}
-	StandardBattleDress = Armor{Name: "Standard Battle Dress", Description: "Lightly-plated armor worn by most marines.", Cost: "2kcr", ArmorPoints: 7, O2: "None", Speed: "Normal", Special: "Includes short-range comms."}
-	AdvancedBattleDress = Armor{Name: "Advanced Battle Dress", Description: "Heavy armor for marines deployed in high combat offworld engagements.", Cost: "12kcr", ArmorPoints: 10, O2: "1 hr", Speed: "[-]", Special: "Includes short-range comms, body cam, headlamp, HUD, exoskeletal weave (Strength Checks [+]), and radiation shielding. Damage Reduction: 3."}
+	StandardCrewAttire         = Armor{Name: "Standard Crew Attire", Description: "Basic clothing.", Cost: "100cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
+	TankTopAndCamoPants        = Armor{Name: "Tank Top and Camo Pants", Description: "Basic clothing.", Cost: "100cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
+	DressUniform               = Armor{Name: "Dress Uniform", Description: "Formal attire for officers and diplomats.", Cost: "500cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
+	ManufacturerSuppliedAttire = Armor{Name: "Manufacturer Supplied Attire", Description: "Basic clothing provided by your manufacturer.", Cost: "50cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
+	CorporateAttire            = Armor{Name: "Corporate Attire", Description: "Formal attire for corporate officers and diplomats.", Cost: "500cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
+	LabCoat                    = Armor{Name: "Lab Coat", Description: "Standard lab coat for scientists.", Cost: "100cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
+	Scrubs                     = Armor{Name: "Scrubs", Description: "Standard scrubs for medical personnel.", Cost: "100cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
+	CivilianClothes            = Armor{Name: "Civilian Clothes", Description: "Casual clothing for civilians.", Cost: "50cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
+	LoungeWear                 = Armor{Name: "Lounge Wear", Description: "Comfortable clothing for relaxation.", Cost: "50cr", ArmorPoints: 1, O2: "None", Speed: "Normal"}
+	Fatigues                   = Armor{Name: "Fatigues", Description: "Basic clothing.", Cost: "100cr", ArmorPoints: 2, O2: "None", Speed: "Normal"}
+	HeavyDutyWorkClothes       = Armor{Name: "Heavy Duty Work Clothes", Description: "Durable clothing for rough environments.", Cost: "200cr", ArmorPoints: 2, O2: "None", Speed: "Normal"}
+	Vaccsuit                   = Armor{Name: "Vaccsuit", Description: "Designed for outer space operations", Cost: "10kcr", ArmorPoints: 3, O2: "12 hrs", Speed: "[-]", Special: "Includes short-range comms, headlamp, and radiation shielding. Decompression within 1d5 rounds if punctured."}
+	HazardSuit                 = Armor{Name: "Hazard Suit", Description: "Environmental protection while exploring unknown planets.", Cost: "4kcr", ArmorPoints: 5, O2: "1 hr", Speed: "Normal", Special: "Includes air filter, extreme heat/cold protection, hydration reclamation (1L of water lasts 4 days), short-range comms, headlamp, and radiation shielding."}
+	StandardBattleDress        = Armor{Name: "Standard Battle Dress", Description: "Lightly-plated armor worn by most marines.", Cost: "2kcr", ArmorPoints: 7, O2: "None", Speed: "Normal", Special: "Includes short-range comms."}
+	AdvancedBattleDress        = Armor{Name: "Advanced Battle Dress", Description: "Heavy armor for marines deployed in high combat offworld engagements.", Cost: "12kcr", ArmorPoints: 10, O2: "1 hr", Speed: "[-]", Special: "Includes short-range comms, body cam, headlamp, HUD, exoskeletal weave (Strength Checks [+]), and radiation shielding. Damage Reduction: 3."}
 	// Weapons
 	Ammo                     = Weapon{Name: "Ammo", Cost: "50cr", Special: "Per magazine/container"}
 	BoardingAxe              = Weapon{Name: "Boarding Axe", Cost: "150cr", Range: "Adjacent", Damage: "2d10", Wound: "Gore[+]"}
@@ -177,6 +191,7 @@ var (
 	Revolver                 = Weapon{Name: "Revolver", Cost: "500cr", Range: "Close", Damage: "1d10+1", Shots: 6, Wound: "Gunshot"}
 	RiggingGun               = Weapon{Name: "Rigging Gun", Cost: "350cr", Range: "Close", Damage: "1d10+2d10 when removed", Shots: 1, Wound: "Bleeding[+]", Special: "100m micro-filament. Body Save or become entangled."}
 	Scalpel                  = Weapon{Name: "Scalpel", Cost: "50cr", Range: "Adjacent", Damage: "1d5", Wound: "Bleeding [+]"}
+	CombatKnife              = Weapon{Name: "Combat Knife", Cost: "50cr", Range: "Adjacent", Damage: "1d5[+]", Wound: "Bleeding [+]"}
 	SmartRifle               = Weapon{Name: "Smart Rifle", Cost: "5kcr", Range: "Extreme", Damage: "4d10 (AA)", Shots: 3, Wound: "Gunshot[+]", Special: "[-] on Combat Check when fired at Close Range."}
 	SMG                      = Weapon{Name: "SMG", Cost: "1kcr", Range: "Long", Damage: "2d10", Shots: 5, Wound: "Gunshot", Special: "Can be fired one-handed."}
 	StunBaton                = Weapon{Name: "Stun Baton", Cost: "150cr", Range: "Adjacent", Damage: "1d5", Wound: "Blunt Force", Special: "Body Save or stunned for 1 round."}
@@ -229,4 +244,57 @@ var (
 	WaterFiltrationDevice       = Item{Name: "Water Filtration Device", Cost: "50cr", Description: "Can pump 4 liters of filtered water per hour from even the most brackish swamps."}
 )
 
-// TODO: Trinkets and patches
+// TODO: Pets
+
+// TODO: Create items that are not equipment, such as "Challenge Coin" or "Leash".
+var MarineLoadouts = [][]ItemInterface{
+	{TankTopAndCamoPants, CombatKnife, Stimpak},
+	{AdvancedBattleDress, Flamethrower, BoardingAxe, Ammo},
+	{StandardBattleDress, CombatShotgun, Rucksack, MoHabUnit, Ammo},
+	{StandardBattleDress, PulseRifle, InfraredGoggles, Ammo, Ammo, Ammo},
+	{StandardBattleDress, SmartRifle, Binoculars, PersonalLocator, Ammo, Ammo, Ammo},
+	{StandardBattleDress, SMG, MRE, Ammo, Ammo, Ammo},
+	{Fatigues, CombatShotgun, Item{Name: "Dog"}, Ammo, Item{Name: "Leash"}, Item{Name: "Tennis Ball"}},
+	{Fatigues, Revolver, Ammo, Ammo, FragGrenade},
+	{DressUniform, Revolver, Ammo, Item{Name: "Challenge Coin"}},
+	{AdvancedBattleDress, GeneralPurposeMachineGun, HUD, Ammo},
+}
+
+var AndroidLoadouts = [][]ItemInterface{
+	{Vaccsuit, SmartRifle, Ammo, Ammo, InfraredGoggles, MylarBlanket},
+	{Vaccsuit, Revolver, Ammo, Ammo, LongrangeComms, Item{Name: "Satchel"}},
+	{HazardSuit, Revolver, Ammo, FirstAidKit, Flashlight, Item{Name: "Defibrillator"}, Item{Name: "Satchel"}},
+	{HazardSuit, FoamGun, Ammo, Ammo, SampleCollectionKit, AssortedTools},
+	{StandardBattleDress, TranqPistol, Ammo, Paracord},
+	{StandardCrewAttire, StunBaton, Item{Name: "Small Pet (organic)"}},
+	{StandardCrewAttire, Scalpel, Bioscanner},
+	{StandardCrewAttire, FragGrenade, Item{Name: "Pen Knife (as Scalpel)"}},
+	{ManufacturerSuppliedAttire, Item{Name: "Jump-9 Ticket (destination blank)"}},
+	{CorporateAttire, Item{Name: "VIP Corporate Key Card"}},
+}
+
+var ScientistLoadouts = [][]ItemInterface{
+	{HazardSuit, TranqPistol, Ammo, Bioscanner, SampleCollectionKit},
+	{HazardSuit, Flamethrower, Ammo, Stimpak, ElectronicToolSet},
+	{Vaccsuit, RiggingGun, SampleCollectionKit, Flashlight, Item{Name: "Lab Rat (pet)"}},
+	{Vaccsuit, FoamGun, Ammo, FoldableStretcher, FirstAidKit, RadiationPills},
+	{LabCoat, AssortedTools, Medscanner, Item{Name: "Vaccine (1 dose)"}},
+	{LabCoat, CyberneticDiagnosticScanner, PortableComputerTerminal},
+	{Scrubs, Scalpel, Automed, OxygenTank, Item{Name: "Filter Mask"}},
+	{Scrubs, MylarBlanket, FirstAidKit, Item{Name: "Vial of Acid"}},
+	{StandardCrewAttire, Item{Name: "Utility Knife (as Scalpel)"}, CyberneticDiagnosticScanner, Item{Name: "Duct Tape"}},
+	{CivilianClothes, Item{Name: "Briefcase"}, Item{Name: "Prescription Pad"}, Item{Name: "Fountain Pen (Poison Injector)"}},
+}
+
+var TeamsterLoadouts = [][]ItemInterface{
+	{Vaccsuit, LaserCutter, Ammo, Ammo, PatchKit, AssortedTools},
+	{Vaccsuit, Revolver, Ammo, Crowbar, Flashlight},
+	{Vaccsuit, RiggingGun, Ammo, SalvageDrone, Item{Name: "Shovel"}},
+	{HazardSuit, Vibechete, WaterFiltrationDevice, Item{Name: "Spanner"}, MoHabUnit},
+	{HeavyDutyWorkClothes, ExplosivesAndDetonator, Item{Name: "Cigarettes"}},
+	{HeavyDutyWorkClothes, AssortedTools, Paracord, SalvageDrone},
+	{StandardCrewAttire, CombatShotgun, Ammo, Item{Name: "Extension Cord"}, Item{Name: "Cat (pet)"}},
+	{StandardCrewAttire, NailGun, Ammo, Item{Name: "Head Lamp"}, AssortedTools, Item{Name: "Lunch Box"}},
+	{StandardCrewAttire, FlareGun, Ammo, Ammo, WaterFiltrationDevice, PersonalLocator, Item{Name: "Subsurface Scanner"}},
+	{LoungeWear, Crowbar, Stimpak, Item{Name: "Six Pack of Beer"}},
+}

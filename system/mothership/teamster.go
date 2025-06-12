@@ -37,8 +37,8 @@ func (t *Teamster) Adjustments() (Stats, Saves, int) {
 	return Stats{Strength: 5, Speed: 5, Intellect: 5, Combat: 5}, Saves{Sanity: 10, Fear: 10, Body: 10}, 0
 }
 
-func (t *Teamster) Loadout() []Equipment {
-	return nil
+func (t *Teamster) Loadout() []ItemInterface {
+	return TeamsterLoadouts[utils.TD(len(TeamsterLoadouts))]
 }
 
 func NewTeamster() *Teamster {

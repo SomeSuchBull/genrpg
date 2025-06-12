@@ -2,6 +2,7 @@ package mothership
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/genrpg/utils"
 )
@@ -23,21 +24,62 @@ type Class interface {
 	Skills() []Skill
 	Name() string
 	Adjustments() (Stats, Saves, int)
-	Loadout() []Equipment
+	Loadout() []ItemInterface
 }
 
-type Skills map[string]int
+type Skills []Skill
+
+func (s Skills) String() string {
+	value := ""
+	trained := []string{}
+	expert := []string{}
+	master := []string{}
+	for _, skill := range s {
+		switch skill.Type {
+		case SkillTypeTrained:
+			trained = append(trained, skill.Name)
+		case SkillTypeExpert:
+			expert = append(expert, skill.Name)
+		case SkillTypeMaster:
+			master = append(master, skill.Name)
+		}
+	}
+	if len(trained) > 0 {
+		value += fmt.Sprintf("Trained Skills (+10): %s\n", strings.Join(trained, ", "))
+	}
+	if len(expert) > 0 {
+		value += fmt.Sprintf("Expert Skills (+15): %s\n", strings.Join(expert, ", "))
+	}
+	if len(master) > 0 {
+		value += fmt.Sprintf("Master Skills (+20): %s\n", strings.Join(master, ", "))
+	}
+	return value
+}
+
+type Equipment []ItemInterface
+
+func (e Equipment) String() string {
+	var value string
+	if len(e) > 0 {
+		eList := make([]string, len(e))
+		for i, item := range e {
+			eList[i] = item.String()
+		}
+		value = fmt.Sprintf("Equipment:\n- %s", strings.Join(eList, "\n- "))
+	}
+	return value
+}
 
 type PC struct {
 	Stats       Stats
 	Saves       Saves
 	Class       Class
-	Skills      []Skill
+	Skills      Skills
 	Health      int
 	Wounds      int
 	Stress      int
 	ArmorPoints int
-	Equipment   []Equipment
+	Equipment   Equipment
 	Credits     int
 }
 
@@ -70,37 +112,42 @@ func NewPC() *PC {
 func (pc *PC) String() string {
 	value := fmt.Sprintf(`
 Class: %s
+
 Stats:
-  Strength:  %d
-  Speed:     %d
-  Intellect: %d
-  Combat:    %d
+	Strength:  %d
+	Speed:     %d
+	Intellect: %d
+	Combat:    %d
+
 Saves:
-  Sanity: %d
-  Fear:   %d
-  Body:   %d
-Health:      %d
-Wounds:      %d
-Stress:      %d
+	Sanity: %d
+	Fear:   %d
+	Body:   %d
+
+Health: %d
+Wounds: %d
+Stress: %d
+
 Armor Points: %d
-Skills: %v
-Equipment: %v
-Credits:     %d
-`, pc.Class.Name(),
+
+Skills:
+%v
+%v
+
+Credits: %d
+
+For details on Equipment, check Player's Survival Guide.`, pc.Class.Name(),
+		// Stats
 		pc.Stats.Strength,
 		pc.Stats.Speed,
 		pc.Stats.Intellect,
 		pc.Stats.Combat,
+		// Saves
 		pc.Saves.Sanity,
 		pc.Saves.Fear,
 		pc.Saves.Body,
-		pc.Health,
-		pc.Wounds,
-		pc.Stress,
-		pc.ArmorPoints,
-		pc.Skills,
-		pc.Equipment,
-		pc.Credits)
+
+		pc.Health, pc.Wounds, pc.Stress, pc.ArmorPoints, pc.Skills, pc.Equipment, pc.Credits)
 	return value
 }
 
@@ -136,4 +183,11 @@ func (pc *PC) AdjustNumbers() {
 	pc.Wounds += wounds
 }
 
-func (pc *PC) Loadout() {}
+func (pc *PC) Loadout() {
+	pc.Equipment = pc.Class.Loadout()
+	for _, item := range pc.Equipment {
+		if armor, ok := item.(Armor); ok {
+			pc.ArmorPoints = armor.ArmorPoints
+		}
+	}
+}
