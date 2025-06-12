@@ -22,10 +22,10 @@ jobs:
         go-version: '1.23'
 
     - name: Build
-      run: go build -v ./...
+      run: go build -o genrpg -v ./...
 
     - name: Upload binary artifact
       uses: actions/upload-artifact@v4
       with:
-        name: my-binary
+        name: genrpg-binary
         path: ./genrpg
