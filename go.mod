@@ -9,12 +9,8 @@ require (
 
 require (
 	github.com/aquilax/go-perlin v1.1.0 // indirect
-	github.com/fzipp/gocyclo v0.6.0 // indirect
-	github.com/kisielk/errcheck v1.8.0 // indirect
 	github.com/ojrac/opensimplex-go v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/tools v0.17.0 // indirect
 )
 
 require (
